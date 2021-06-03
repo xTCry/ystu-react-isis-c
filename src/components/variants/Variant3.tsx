@@ -45,6 +45,7 @@ export class Variant3 extends React.Component<{ data: any[] }, CState> {
     render() {
         return (
             <div>
+                <h1>victory</h1>
                 <InterpolationSelect
                     currentValue={this.state.interpolation}
                     values={this.state.polar ? polarInterpolations : cartesianInterpolations}

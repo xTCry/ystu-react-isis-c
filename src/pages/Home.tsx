@@ -6,8 +6,8 @@ const Home = () => (
             <h1 className="title">ISIS Crs</h1>
             <h2 className="subtitle">Crs project</h2>
             <div className="links">
-                <a className="btn btn-gh" href="/#/v7">
-                    V7
+                <a className="btn btn-gh" href="/#/proecess">
+                    Proecess
                 </a>
             </div>
         </div>

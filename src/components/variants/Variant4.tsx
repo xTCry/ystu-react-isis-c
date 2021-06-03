@@ -17,6 +17,7 @@ export class Variant4 extends React.Component<{ data: any[] }, { zoomDomain: { x
     render() {
         return (
             <div>
+                <h1>victory & zoom</h1>
                 <VictoryChart
                     width={600}
                     height={470}

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Varianter from '../components/variants/Varianter';
 
 import '../styles/VariantsPreview.css';
-import { csv_data } from '../csv_data';
+import { csv_data } from '../utils/inputData.util';
 
 class Variants extends React.Component {
     render() {

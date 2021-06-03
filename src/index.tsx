@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { HashRouter as Router, Link,  } from 'react-router-dom';
+import { HashRouter as Router, Link } from 'react-router-dom';
 import { Switch, Route, Redirect } from 'react-router';
 
 import Home from './pages/Home';
@@ -10,11 +10,12 @@ import './styles/index.css';
 import './styles/reset.css';
 import reportWebVitals from './reportWebVitals';
 
-import { csv_data } from './csv_data';
+import { csv_data } from './utils/inputData.util';
 
 import { Variant6 } from './components/variants/Variant6';
 import { Variant7 } from './components/variants/Variant7';
 import TableEditor from './components/editor/Table.editor';
+import { Process } from './pages/Process';
 
 ReactDOM.render(
     <React.StrictMode>
@@ -28,6 +29,9 @@ ReactDOM.render(
                     </Route>
                     <Route path="/v7">
                         <Variant7 data={csv_data} />
+                    </Route>
+                    <Route path="/proecess">
+                        <Process data={csv_data} />
                     </Route>
                     <Route exact path="/variants" component={Variants} />
                     <Route exact path="/variants/:variant" component={Variants} />

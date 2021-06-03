@@ -6,6 +6,7 @@ export class Variant2 extends React.Component<{ data: any[] }> {
     render() {
         return (
             <div className="App">
+                <h1>react-vis</h1>
                 {/* <XYPlot height={300} width={300}>
                     <LineSeries data={data} />
                 </XYPlot> */}
