@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tooltip } from 'chart.js';
+import { Tooltip, defaults } from 'chart.js';
 import { Line, Chart } from 'react-chartjs-2';
 import { LineWithErrorBarsController as ErrorBarsController } from 'chartjs-chart-error-bars';
 import zoomPlugin from 'chartjs-plugin-zoom';
@@ -8,6 +8,7 @@ import { ChartRegressions } from 'chartjs-plugin-regression';
 import * as formulasUtil from '../../utils/formulas.util';
 
 Chart.register(ErrorBarsController, zoomPlugin, ChartRegressions);
+// defaults.animation = false;
 
 export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
     const csvDataP = props.data;
@@ -44,16 +45,6 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
         // console.log('upd csvData');
         chart.current?.update();
     }, [csvDataP, setCsvData]);
-
-    /* React.useEffect(() => {
-        set_std(formulasUtil.stdCalc(yArr));
-        set_std20(formulasUtil.stdCalc(yArr.slice(0, 20)));
-
-        set_roman(formulasUtil.Roman(yArr.slice(0, 20), std20));
-        set_sigma(formulasUtil.Sigma(yArr, std));
-        
-        console.log('upd yArr & std', std);
-    }, [csvDataP, yArr]); */
 
     const [responsive, setResponsive] = React.useState(true);
 
@@ -133,12 +124,36 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
         },
     };
 
+    const labels = csvData.map((e) => e.x);
+        
+    const overwriteData = 'all' || true;
+    const NUM_NORMAL_ELEMS = labels.length;
+    const NUM_ELEMS_PREDICT = NUM_NORMAL_ELEMS + 33;
+
+    const numElems = overwriteData ? NUM_ELEMS_PREDICT : NUM_NORMAL_ELEMS;
+
+    let lastLabel = null;
+    const smartLabesls = new Array(numElems).fill(null).map((v, i) => {
+        if (i == NUM_NORMAL_ELEMS) {
+            lastLabel = Number(labels[i - 1]) - i + 1;
+        }
+        return i < labels.length ? Number(labels[i]) : lastLabel + Number(i);
+    });
+
+    const generateData = (numElems, tempData) =>
+        new Array(numElems).fill(0).map((v, i) => (i >= NUM_NORMAL_ELEMS ? null : tempData[i].y));
+
+    const newData = generateData(numElems, csvData);
+
+    const chartType = 'bar'; //'line'
+    const isBarChart = chartType == 'bar';
+
     const isDownOrUp = (ctx, value) => ctx.p0.parsed.y > ctx.p1.parsed.y ? value : undefined;
     const isOkkay = (ctx) =>
         ctx.p0.$context?.raw?.isOk === false || ctx.p1.$context?.raw?.isOk === false ? 'yellow' : undefined;
 
     const dataRomanAndSigma = {
-        labels: csvData.map((e) => e.x),
+        labels: smartLabesls,
         datasets: [
             // Roman
             {
@@ -208,35 +223,32 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
                 borderColor: 'rgba(20, 90, 800, 0.2)',
                 tension: 0.1,
             },
-        ],
-    };
 
-    const dataSigma = {
-        labels: csvData.map((e) => e.x),
-        datasets: [
+            // regressions
             {
-                label: '# of Years (Sigma)',
-                data: sigma.map((e) => ({
-                    y: e.y,
-                    yMin: e.y - e.beta,
-                    yMax: e.y + e.beta,
-                })),
+                label: 'ys (full)',
+                data: newData,
                 fill: false,
-                // backgroundColor: 'rgb(255, 99, 132)',
-                // borderColor: 'rgba(255, 99, 132, 0.2)',
-            },
-        ],
-    };
+                // showLine: isBarChart,
+                borderColor: 'rgba(120,120,120,1)',
+                backgroundColor: 'rgba(120,120,120,0.5)',
 
-    const dataDefault = {
-        labels: csvData.map((e) => e.x),
-        datasets: [
-            {
-                label: '# of Years',
-                data: csvData.map((e) => e.y),
-                fill: false,
-                // backgroundColor: 'rgb(255, 99, 132)',
-                // borderColor: 'rgba(255, 99, 132, 0.2)',
+                regressions: {
+                    type: ['linear', 'exponential', 'polynomial'],
+                    line: { color: 'blue', width: 3 },
+                    extendPredictions: true,
+                    sections: [
+                        {
+                            endIndex: NUM_NORMAL_ELEMS - 1,
+                            line: { color: 'red' }
+                        },
+                        {
+                            type: 'copy',
+                            copy: { fromSectionIndex: 0, overwriteData },
+                            startIndex: NUM_NORMAL_ELEMS - 1
+                        }
+                    ]
+                },
             },
         ],
     };
@@ -254,40 +266,10 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
             {/* <Line type="line" data={data2} options={options} /> */}
 
             <h1>romanOf & sigma</h1>
-            <Line ref={chart} type="line" data={dataRomanAndSigma} options={options} />
+            <Line ref={chart} type="line" plugins={[ChartRegressions]} data={dataRomanAndSigma} options={options} />
             <hr />
 
             {/* <ChartComponent ref={chart} type={ErrorBarsController.id} data={dataRomanAndSigma} options={options} /> */}
-
-            {/* <ChartComponent
-                type="line"
-                plugins={[ChartRegressions]}
-                data={{
-                    labels: csvData.map((e) => e.x),
-                    datasets: [
-                        {
-                            label: 'data#qq',
-                            data: csvData.map((e) => e.y), // settled in shuffle() function
-                            // Configuration of the plugin for the dataset:
-                            // regressions: { type: 'linear', line: { color: 'red' } }
-                            regressions: {
-                                type: 'polynomial',
-                                line: { color: '#0000ff', width: 3 },
-                                calculation: { precision: 10, order: 4 },
-                            },
-                        },
-                    ],
-                }}
-                options={{
-                    plugins: {
-                        // regressions: {
-                        //     type: ['linear'],
-                        //     line: { color: 'blue', width: 3 },
-                        //     onCompleteCalculation: (chart) => {},
-                        // },
-                    },
-                }}
-            /> */}
 
             {/* <h1>sigma</h1>
             <ChartComponent type={ErrorBarsController.id} data={dataSigma} options={options} />

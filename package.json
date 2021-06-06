@@ -15,7 +15,7 @@
     "@types/react-table": "^7.7.1",
     "chart.js": "3.1.0",
     "chartjs-chart-error-bars": "^3.0.1",
-    "chartjs-plugin-regression": "^0.2.1",
+    "chartjs-plugin-regression": "file:../chartjs-plugin-regression",
     "chartjs-plugin-zoom": "^1.0.1",
     "d3-scale": "^3.3.0",
     "lodash.debounce": "^4.0.8",

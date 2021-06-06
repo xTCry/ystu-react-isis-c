@@ -3509,10 +3509,8 @@ chartjs-chart-error-bars@^3.0.1:
   resolved "https://registry.yarnpkg.com/chartjs-chart-error-bars/-/chartjs-chart-error-bars-3.0.1.tgz#af12250b12b4f99f644d1dca5ebd7b06580fed01"
   integrity sha512-lMZtHlTNQAw7simfBj8S5XWYNhlAgnf+3vcf6Obk39O9Kk1s6IFNFr0tBtD5tQ43jtpHCK4FhIyZ0MgOJGZroQ==
 
-chartjs-plugin-regression@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/chartjs-plugin-regression/-/chartjs-plugin-regression-0.2.1.tgz#b710e3ba8b580eaa06210ea5e2717ebe7f0939b6"
-  integrity sha512-87LCN1J9KeQlPRpdSUU3YOcOHUtfTTCOJXUuBAXuc8VVlKQjZdq7M9j60d4/juaHWxcGE7uGeUAnye2/FdtjJw==
+"chartjs-plugin-regression@file:../chartjs-plugin-regression":
+  version "3.0.0"
   dependencies:
     regression "^2.0.1"
 
