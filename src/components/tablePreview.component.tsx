@@ -1,6 +1,12 @@
 import { useTable } from 'react-table';
 
-export const TablePreview = ({ columns, data }) => {
+export const TablePreview = ({ data }) => {
+    const columns = [
+        // { name: 'id', title: 'Id' },
+        { accessor: 'x', Header: 'Год' },
+        { accessor: 'y', Header: 'Значение' },
+    ];
+
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
         columns,
         data,

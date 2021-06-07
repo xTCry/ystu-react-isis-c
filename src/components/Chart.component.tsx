@@ -156,14 +156,15 @@ const ChartComponent = React.forwardRef<Chart | undefined, Props>((props, ref) =
     return (
         <canvas
             {...rest}
-            height={height}
-            width={width}
+            // height={height}
+            // width={width}
             ref={canvas}
             id={id}
+            // style={{ maxWidth: '100% !important' }}
             className={className}
             // onClick={onClick}
-            data-testid="canvas"
-            role="img"
+            // data-testid="canvas"
+            // role="img"
         >
             {fallbackContent}
         </canvas>
