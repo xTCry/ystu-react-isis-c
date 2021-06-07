@@ -148,6 +148,23 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
     const chartType = 'bar'; //'line'
     const isBarChart = chartType == 'bar';
 
+    // ******
+
+    const createSmoothData = (data, smoothValue = 3) => {
+        let result = [data[0]];
+        for (let i = 1; i < data.length - 2; i += smoothValue) {
+            const { x } = data[i];
+            const y = data.slice(i, i + smoothValue)
+                .map((e) => e.y)
+                .reduce((a, b) => a + b) / smoothValue;
+            result.push({ x, y });
+        }
+        result.push(data[data.length - 1]);
+        return result;
+    };
+
+    const ys_smooth = createSmoothData(csvData);
+
     const isDownOrUp = (ctx, value) => ctx.p0.parsed.y > ctx.p1.parsed.y ? value : undefined;
     const isOkkay = (ctx) =>
         ctx.p0.$context?.raw?.isOk === false || ctx.p1.$context?.raw?.isOk === false ? 'yellow' : undefined;
@@ -249,6 +266,14 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
                         }
                     ]
                 },
+            },
+
+            {
+                label: 'ys (smooth=3)',
+                data: ys_smooth,
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'green',
+                tension: 0.5,
             },
         ],
     };
