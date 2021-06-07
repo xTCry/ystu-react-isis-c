@@ -28,7 +28,9 @@ ReactDOM.render(
                     <Route path="/proecess">
                         <Process data={csv_data} />
                     </Route>
-                    <Route exact path="/edit" component={TableEditor} />
+                    <Route exact path="/edit">
+                        <TableEditor data={csv_data} />
+                    </Route>
                     <Route exact path="/" component={Home} />
 
                     <Route path="*">

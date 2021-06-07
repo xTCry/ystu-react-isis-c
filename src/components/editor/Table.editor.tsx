@@ -51,8 +51,10 @@ const validate = (changed, validationStatus) =>
         return { ...status, [id]: rowStatus };
     }, {});
 
-const TableEditor = (props: { data: { x: number; y: number }[]; setData: Function }) => {
-    const { data, setData } = props;
+const TableEditor = (props: { data: { x: number; y: number }[]; setData?: Function }) => {
+    const [_data, _setData] = React.useState(props.data);
+    const [data, setData] = props.setData ? [props.data, props.setData] : [_data, _setData];
+
     const [rows, setRows] = useState(data.map((e, i) => ({ id: i, ...e })));
     const [editingCells, setEditingCells] = useState([]);
 

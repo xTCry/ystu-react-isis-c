@@ -5,8 +5,6 @@ export const stdCalc = (e) => {
     return Math.sqrt(e.map((x) => (x - mean) ** 2).reduce((a, b) => a + b) / e.length);
 };
 
-export type PlotXY = { x: number; y: number };
-
 const floatingDivision = 3;
 
 export const Roman = (yArr: number[], std: number) => {

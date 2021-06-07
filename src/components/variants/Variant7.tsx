@@ -1,14 +1,14 @@
 import React from 'react';
-import { Tooltip, defaults } from 'chart.js';
-import { Line, Chart } from 'react-chartjs-2';
+import { Chart, Tooltip } from 'chart.js';
+import 'react-chartjs-2';
 import { LineWithErrorBarsController as ErrorBarsController } from 'chartjs-chart-error-bars';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { ChartRegressions } from 'chartjs-plugin-regression';
 
 import * as formulasUtil from '../../utils/formulas.util';
+import ChartComponent from '../Chart.component';
 
 Chart.register(ErrorBarsController, zoomPlugin, ChartRegressions);
-// defaults.animation = false;
 
 export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
     const csvDataP = props.data;
@@ -26,11 +26,6 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
     const [roman, set_roman] = React.useState(formulasUtil.Roman(yArr.slice(0, 20), std20));
     const [sigma, set_sigma] = React.useState(formulasUtil.Sigma(yArr, std, sigmaMult));
 
-    const onKek = React.useCallback(() => {
-        chart.current.options.plugins.legend.position = 'right';
-        chart.current?.update();
-    }, []);
-
     React.useEffect(() => {
         const yArr = csvDataP.map((e) => e.y);
         setYArr(yArr);
@@ -42,8 +37,7 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
         set_sigma(formulasUtil.Sigma(yArr, std));
 
         setCsvData(csvDataP);
-        // console.log('upd csvData');
-        chart.current?.update();
+        // chart.current?.update();
     }, [csvDataP, setCsvData]);
 
     const [responsive, setResponsive] = React.useState(true);
@@ -91,11 +85,11 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
                 callbacks: {
                     footer: (items) => {
                         let okArr = [];
-                        for(const item of items) {
+                        for (const item of items) {
                             if (typeof item.raw !== 'object') {
                                 continue;
                             }
-                            
+
                             okArr.push(item.raw?.isOk);
                         }
                         return `Okkays: ${okArr.join(', ')}`;
@@ -105,7 +99,7 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
                         const v = item.chart.data.datasets[item.datasetIndex].data[item.dataIndex] as any;
 
                         return `${base}${v.beta ? ` (Beta: ${v.beta})` : ''}`;
-                    }
+                    },
                 },
             },
         },
@@ -184,7 +178,7 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
                 fill: false,
                 backgroundColor: 'rgb(255, 99, 132)',
                 borderColor: 'rgba(255, 99, 132, 0.2)',
-
+    
                 segment: {
                     // borderColor: (ctx) => isDownOrUp(ctx, 'rgb(192,75,75)'),
                     borderColor: isOkkay,
@@ -209,7 +203,7 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
                 borderColor: 'rgba(20, 90, 110, 0.2)',
                 tension: 0.5,
             },
-
+    
             // Sigma
             {
                 type: ErrorBarsController.id,
@@ -225,7 +219,7 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
                 segment: {
                     borderColor: isOkkay,
                 },
-
+    
                 options: {
                     errorBarColor: ['red', 'green'],
                 },
@@ -240,7 +234,7 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
                 borderColor: 'rgba(20, 90, 800, 0.2)',
                 tension: 0.1,
             },
-
+    
             // regressions
             {
                 label: 'ys (full)',
@@ -249,7 +243,7 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
                 // showLine: isBarChart,
                 borderColor: 'rgba(120,120,120,1)',
                 backgroundColor: 'rgba(120,120,120,0.5)',
-
+    
                 regressions: {
                     type: ['linear', 'exponential', 'polynomial'],
                     line: { color: 'blue', width: 3 },
@@ -257,17 +251,17 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
                     sections: [
                         {
                             endIndex: NUM_NORMAL_ELEMS - 1,
-                            line: { color: 'red' }
+                            line: { color: 'red' },
                         },
                         {
                             type: 'copy',
                             copy: { fromSectionIndex: 0, overwriteData },
-                            startIndex: NUM_NORMAL_ELEMS - 1
-                        }
-                    ]
+                            startIndex: NUM_NORMAL_ELEMS - 1,
+                        },
+                    ],
                 },
             },
-
+    
             {
                 label: 'ys (smooth=3)',
                 data: ys_smooth,
@@ -275,8 +269,18 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
                 borderColor: 'green',
                 tension: 0.5,
             },
-        ],
+        ]
     };
+
+    const onKek = React.useCallback(() => {
+    }, []);
+
+    const lineChart = React.useMemo(
+        () => (
+            <ChartComponent ref={chart} plugins={[ChartRegressions]} data={dataRomanAndSigma} options={options} />
+        ),
+        [dataRomanAndSigma]
+    );
 
     return (
         <>
@@ -288,17 +292,10 @@ export const Variant7 = (props: { data: { x: number; y: number }[] }) => {
                 <br />
                 std * {sigmaMult} = <b>{std * sigmaMult}</b>
             </pre>
-            {/* <Line type="line" data={data2} options={options} /> */}
 
             <h1>romanOf & sigma</h1>
-            <Line ref={chart} type="line" plugins={[ChartRegressions]} data={dataRomanAndSigma} options={options} />
+            {lineChart}
             <hr />
-
-            {/* <ChartComponent ref={chart} type={ErrorBarsController.id} data={dataRomanAndSigma} options={options} /> */}
-
-            {/* <h1>sigma</h1>
-            <ChartComponent type={ErrorBarsController.id} data={dataSigma} options={options} />
-            <hr /> */}
         </>
     );
 };;
