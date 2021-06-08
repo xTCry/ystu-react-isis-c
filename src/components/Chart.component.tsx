@@ -55,7 +55,6 @@ const ChartComponent = React.forwardRef<Chart | undefined, Props>((props, ref) =
     };
 
     const destroyChart = () => {
-        console.log('chart.destroy', chart);
         if (chart) chart.destroy();
     };
 

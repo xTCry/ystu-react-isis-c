@@ -11,7 +11,7 @@ import {
 } from '@devexpress/dx-react-grid-material-ui';
 // import debounce from 'lodash.debounce';
 
-const ruleRequired = (value) => value?.trim().length > 0 || 'This field is required';
+const ruleRequired = (value) => String(value)?.trim().length > 0 || 'This field is required';
 const ruleNumber = (value) => !isNaN(Number(value)) || 'This field is number';
 const numberFormat = (value) => Number(value);
 
@@ -85,7 +85,7 @@ const TableEditor = (props: { data: { x: number; y: number }[]; setData?: Functi
         setRows(result);
         setData(result.map(({ x, y }) => ({ x, y })));
     };
-    const addEmptyRow = () => commitChanges({ added: [{}] });
+    const addEmptyRow = () => commitChanges({ added: [{ x: 0, y: 0 }] });
 
     const [validationStatus, setValidationStatus] = useState({});
     const Cell = React.useCallback(

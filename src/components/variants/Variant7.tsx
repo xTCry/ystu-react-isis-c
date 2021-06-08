@@ -105,8 +105,8 @@ export const Variant7 = (props: {
     overwriteData?: 'all' | 'none' | 'last';
     regressionsTypes: any;
     isDisplayAllRegressionsTypes: boolean;
+    chart: any;
 }) => {
-    const chart = React.useRef(null);
     const [responsive, setResponsive] = React.useState(true);
 
     const {
@@ -183,6 +183,9 @@ export const Variant7 = (props: {
                     },
                 },
             },
+            regressions: {
+                // onCompleteCalculation: (c) => props.onRegressionResults?.(c),
+            },
         },
         animations: {
             /* y: {
@@ -203,7 +206,7 @@ export const Variant7 = (props: {
     const isOkkay = (ctx) =>
         ctx.p0.$context?.raw?.isOk === false || ctx.p1.$context?.raw?.isOk === false ? 'yellow' : undefined;
 
-    const showRegressionsLine = false;
+    const showRegressionsLine = true;
     const regressionDataset: ChartData['datasets'] = !props.isDisplayAllRegressionsTypes
         ? [
               {
@@ -211,8 +214,8 @@ export const Variant7 = (props: {
                   data: newData,
                   fill: false,
                   showLine: showRegressionsLine,
-                  borderColor: 'rgba(120,120,120,1)',
-                  backgroundColor: 'rgba(120,120,120,0.5)',
+                  borderColor: 'rgba(120,120,120,0.8)',
+                  backgroundColor: 'rgba(120,120,120,0.3)',
 
                   regressions: {
                       type: props.regressionsTypes,
@@ -221,7 +224,7 @@ export const Variant7 = (props: {
                       sections: [
                           {
                               endIndex: dataLength - 1,
-                              line: { color: 'red' },
+                              line: { color: 'rgba(255,10,10,0.6)' },
                           },
                           {
                               type: 'copy',
@@ -238,8 +241,8 @@ export const Variant7 = (props: {
                   data: newData,
                   fill: false,
                   showLine: showRegressionsLine,
-                  borderColor: 'rgba(120,120,120,1)',
-                  backgroundColor: 'rgba(120,120,120,0.5)',
+                  borderColor: 'rgba(120,120,120,0.8)',
+                  backgroundColor: 'rgba(120,120,120,0.3)',
 
                   regressions: {
                       type: ['linear'],
@@ -263,8 +266,8 @@ export const Variant7 = (props: {
                   data: newData,
                   fill: false,
                   showLine: showRegressionsLine,
-                  borderColor: 'rgba(120,120,120,1)',
-                  backgroundColor: 'rgba(120,120,120,0.5)',
+                  borderColor: 'rgba(120,120,120,0.8)',
+                  backgroundColor: 'rgba(120,120,120,0.3)',
 
                   regressions: {
                       type: ['exponential'],
@@ -288,8 +291,8 @@ export const Variant7 = (props: {
                   data: newData,
                   fill: false,
                   showLine: showRegressionsLine,
-                  borderColor: 'rgba(120,120,120,1)',
-                  backgroundColor: 'rgba(120,120,120,0.5)',
+                  borderColor: 'rgba(120,120,120,0.8)',
+                  backgroundColor: 'rgba(120,120,120,0.3)',
 
                   regressions: {
                       type: ['polynomial'],
@@ -395,7 +398,7 @@ export const Variant7 = (props: {
     const onKek = React.useCallback(() => {}, []);
 
     const lineChart = React.useMemo(
-        () => <ChartComponent ref={chart} plugins={[ChartRegressions]} data={dataRomanAndSigma} options={options} />,
+        () => <ChartComponent ref={props.chart} plugins={[ChartRegressions]} data={dataRomanAndSigma} options={options} />,
         [dataRomanAndSigma]
     );
 
@@ -417,4 +420,4 @@ export const Variant7 = (props: {
             <hr />
         </>
     );
-};;
+};

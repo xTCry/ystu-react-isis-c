@@ -1,7 +1,7 @@
 import React from 'react';
 import { Point } from 'chart.js';
 import { TablePreview } from '../components/tablePreview.component';
-import { Variant7 } from '../components/variants/Variant7';
+// import { Variant7 } from '../components/variants/Variant7';
 
 export const Process = (props: { data: Point[] }) => {
     const [data, setData] = React.useState(props.data);

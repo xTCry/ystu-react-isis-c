@@ -3,8 +3,11 @@ import { Container, Row, Col } from 'shards-react';
 
 import PageTitle from '../components/common/PageTitle.component';
 import ChartCard from '../components/cards/Chart-card.component';
-import TableCard from '../components/cards/Table-card.component';
 import SlidersCard from '../components/cards/Sliders-card.component';
+import ChartInfoCard from '../components/cards/ChartInfo-card.component';
+import PivotTableCard from '../components/cards/PivotTable-card.component';
+import FileManagerCard from '../components/cards/FileManager-card.component';
+import TableCsvDataCard from '../components/cards/TableCsvData-card.component';
 
 import { useDebounce } from '../utils/debounceHook-react.util';
 import { csv_data } from '../utils/inputData.util';
@@ -23,10 +26,12 @@ const MainPage = () => {
                 <Col lg="9" md="9" sm="12" className="mb-4">
                     <ChartCard csv_data={data} prediction={prediction} smoothLevel={smoothLevel} />
                     <SlidersCard changePrediction={setPrediction} changeSmoothLevel={setSmoothLevel} />
+                    <PivotTableCard data={data} />
                 </Col>
                 <Col lg="3" className="mb-4">
-                    {/* regression info */}
-                    <TableCard csv_data={data} setCsvData={setCsvData} />
+                    <FileManagerCard />
+                    <ChartInfoCard />
+                    <TableCsvDataCard csv_data={data} setCsvData={setCsvData} />
                 </Col>
             </Row>
         </Container>
