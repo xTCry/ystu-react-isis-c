@@ -11,7 +11,8 @@ import { csv_data } from '../utils/inputData.util';
 
 const MainPage = () => {
     const [data,setCsvData] = React.useState(() => csv_data);
-    const [prediction, setPrediction] = useDebounce(3, 500);
+    const [prediction, setPrediction] = useDebounce(5, 300);
+    const [smoothLevel, setSmoothLevel] = useDebounce(3, 300);
 
     return (
         <Container fluid className="main-content-container px-4">
@@ -19,11 +20,12 @@ const MainPage = () => {
                 <PageTitle title="Chart viewer" subtitle="Main page" className="text-sm-left mb-3" />
             </Row>
             <Row>
-                <Col lg="9" md="9" sm="9" className="mb-4">
-                    <ChartCard csv_data={data} prediction={prediction} />
-                    <SlidersCard changePrediction={setPrediction} />
+                <Col lg="9" md="9" sm="12" className="mb-4">
+                    <ChartCard csv_data={data} prediction={prediction} smoothLevel={smoothLevel} />
+                    <SlidersCard changePrediction={setPrediction} changeSmoothLevel={setSmoothLevel} />
                 </Col>
                 <Col lg="3" className="mb-4">
+                    {/* regression info */}
                     <TableCard csv_data={data} setCsvData={setCsvData} />
                 </Col>
             </Row>

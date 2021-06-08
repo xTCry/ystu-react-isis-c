@@ -8,7 +8,7 @@ export const Process = (props: { data: Point[] }) => {
 
     return (
         <div>
-            {data.length > 0 && <Variant7 data={data} prediction={33} />}
+            {/* {data.length > 0 && <Variant7 data={data} prediction={33} />} */}
             <TablePreview data={data} />
             {/* <TableEditor data={data} setData={setData} /> */}
         </div>

@@ -14,14 +14,13 @@ const TableCard = ({ title, csv_data, setCsvData }) => (
             <TableEditor data={csv_data} setData={setCsvData} />
         </CardBody>
 
-        <CardFooter className="border-top">
+        {/* <CardFooter className="border-top">
             <Row>
-                {/* View Full */}
                 <Col className="text-right view-report">
                     <a href="#">View full &rarr;</a>
                 </Col>
             </Row>
-        </CardFooter>
+        </CardFooter> */}
     </Card>
 );
 

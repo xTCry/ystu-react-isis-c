@@ -160,7 +160,6 @@ const ChartComponent = React.forwardRef<Chart | undefined, Props>((props, ref) =
             // width={width}
             ref={canvas}
             id={id}
-            // style={{ maxWidth: '100% !important' }}
             className={className}
             // onClick={onClick}
             // data-testid="canvas"

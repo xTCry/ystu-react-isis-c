@@ -1,7 +1,8 @@
-export const avgA = (e) => e.reduce((partial_sum, a) => partial_sum + a, 0) / e.length;
+export const avgA = (e: number[]) => e.reduce((partial_sum, a) => partial_sum + a, 0) / e.length;
 
-export const stdCalc = (e) => {
+export const stdCalc = (e: number[]) => {
     let mean = avgA(e);
+    if (!e.length) return 0;
     return Math.sqrt(e.map((x) => (x - mean) ** 2).reduce((a, b) => a + b) / e.length);
 };
 
@@ -33,6 +34,21 @@ export const Sigma = (data: number[], std: number, sigmaMult = 3) => {
             isOk: std * sigmaMult >= beta,
         };
     });
+};
+
+export const createSmoothData = (data, smoothValue = 3) => {
+    let result = [];
+    for (let i = 0; i < data.length - 2; i += smoothValue) {
+        const { x } = data[i];
+        const y =
+            data
+                .slice(i, i + smoothValue)
+                .map((e) => e.y)
+                .reduce((a, b) => a + b) / smoothValue;
+        result.push({ x, y });
+    }
+    result.push(data[data.length - 1]);
+    return result;
 };
 
 /* const isSmall = !1;
