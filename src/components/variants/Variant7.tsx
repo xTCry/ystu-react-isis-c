@@ -140,18 +140,21 @@ export const Variant7 = (props: {
                         chart.update();
                     },
                 },
-                zoom: {
-                    mode,
-                    wheel: {
-                        enabled: true,
-                    },
-                    pinch: {
-                        enabled: true,
-                    },
-                    onZoomComplete({ chart }) {
-                        chart.update();
-                    },
-                },
+
+                // TODO: fix this!
+                // zoom: {
+                //     mode,
+                //     wheel: {
+                //         enabled: true,
+                //     },
+                //     pinch: {
+                //         enabled: true,
+                //     },
+                //     onZoomComplete({ chart }) {
+                //         chart.update();
+                //     },
+                // },
+
                 limits: {
                     // y: {
                     //     max: 20,
@@ -398,7 +401,7 @@ export const Variant7 = (props: {
     const onKek = React.useCallback(() => {}, []);
 
     const lineChart = React.useMemo(
-        () => <ChartComponent ref={props.chart} plugins={[ChartRegressions]} data={dataRomanAndSigma} options={options} />,
+        () => <ChartComponent ref={props.chart} id="smart-chart" plugins={[ChartRegressions]} data={dataRomanAndSigma} options={options} />,
         [dataRomanAndSigma]
     );
 

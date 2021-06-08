@@ -87,51 +87,75 @@ export function calcLinear(xValues = [], yValues = [], decimal = 2) {
 export function calcParab(xValues = [], yValues = [], decimal = 2) {
     var count = xValues.length + 0.0;
 
+    if (xValues.length < 1 || yValues.length < 1) {
+        return {
+            name: 'parab',
+            formula: null,
+            dOst: null,
+            r: null,
+            R: null,
+            A: null,
+            f1: null,
+        };
+    }
+    console.log('xValues len', xValues, yValues);
+
     var power = 2;
+    try {
+        var p = polyfit(xValues, yValues, 2);
 
-    var p = polyfit(xValues, yValues, 2);
+        const func = (x) => {
+            var res = 0.0;
 
-    const func = (x) => {
-        var res = 0.0;
+            for (let i = 0; i <= power; i++) {
+                res += Math.pow(x, i) * p[i];
+            }
+
+            return res;
+        };
+
+        let f2Values = xValues.map((x) => func(x));
+
+        var yDiff = yValues.map((y, i) => Math.pow(y - f2Values[i], 2));
+        var yDiffSum = yDiff.reduce(sumFunc);
+
+        var dOst = yDiffSum / count;
+
+        var r = Math.sqrt(1 - yDiffSum / yValues.map((y) => Math.pow(y - avg(yValues), 2)).reduce(sumFunc));
+        var R = Math.pow(r, 2);
+
+        var avrgValues = xValues.map((x, i) => Math.abs((yValues[i] - f2Values[i]) / yValues[i]) * 100);
+
+        var A = (1 / count) * avrgValues.reduce(sumFunc);
+
+        var f1 = (R * (count - 3)) / (1 - R) / 2;
+
+        var formula = 'y = ';
 
         for (let i = 0; i <= power; i++) {
-            res += Math.pow(x, i) * p[i];
+            formula += `${i == 0 ? '' : ' + '}${roundNum(p[i], decimal)}${i == 0 ? '' : ` * x ^ ${i}`}`;
         }
 
-        return res;
-    };
-
-    let f2Values = xValues.map((x) => func(x));
-
-    var yDiff = yValues.map((y, i) => Math.pow(y - f2Values[i], 2));
-    var yDiffSum = yDiff.reduce(sumFunc);
-
-    var dOst = yDiffSum / count;
-
-    var r = Math.sqrt(1 - yDiffSum / yValues.map((y) => Math.pow(y - avg(yValues), 2)).reduce(sumFunc));
-    var R = Math.pow(r, 2);
-
-    var avrgValues = xValues.map((x, i) => Math.abs((yValues[i] - f2Values[i]) / yValues[i]) * 100);
-
-    var A = (1 / count) * avrgValues.reduce(sumFunc);
-
-    var f1 = (R * (count - 3)) / (1 - R) / 2;
-
-    var formula = 'y = ';
-
-    for (let i = 0; i <= power; i++) {
-        formula += `${i == 0 ? '' : ' + '}${roundNum(p[i], decimal)}${i == 0 ? '' : ` * x ^ ${i}`}`;
+        return {
+            name: 'parab',
+            formula: formula,
+            dOst: roundNum(dOst, decimal),
+            r: roundNum(r, decimal),
+            R: roundNum(R, decimal),
+            A: roundNum(A, decimal),
+            f1: roundNum(f1, decimal),
+        };
+    } catch (e) {
+        return {
+            name: 'parab',
+            formula: null,
+            dOst: null,
+            r: null,
+            R: null,
+            A: null,
+            f1: null,
+        };
     }
-
-    return {
-        name: 'parab',
-        formula: formula,
-        dOst: roundNum(dOst, decimal),
-        r: roundNum(r, decimal),
-        R: roundNum(R, decimal),
-        A: roundNum(A, decimal),
-        f1: roundNum(f1, decimal),
-    };
 }
 
 export function calcHyperb(xValues = [], yValues = [], decimal = 2) {

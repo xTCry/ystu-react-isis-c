@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardHeader, CardBody, CardFooter, Row, Col, Collapse, Button, ListGroupItem } from 'shards-react';
+import { Card, CardHeader, CardBody, CardFooter, Row, Col, Collapse, Button } from 'shards-react';
 import TableEditor from '../editor/Table.editor';
 
-const TableCsvDataCard = ({ title, csv_data, setCsvData }) => {
+const TableCsvDataCard = ({ title }) => {
     const [isOpen, setOpen] = React.useState(true);
     return (
         <Card small>
@@ -15,7 +15,7 @@ const TableCsvDataCard = ({ title, csv_data, setCsvData }) => {
 
             <Collapse open={isOpen}>
                 <CardBody className="p-0">
-                    <TableEditor data={csv_data} setData={setCsvData} />
+                    <TableEditor />
                 </CardBody>
             </Collapse>
 
@@ -37,19 +37,10 @@ TableCsvDataCard.propTypes = {
      * The component's title.
      */
     title: PropTypes.string,
-    /**
-     * The referral csv data.
-     */
-    csv_data: PropTypes.array,
-    /**
-     * set csv data callback.
-     */
-    setCsvData: PropTypes.func,
 };
 
 TableCsvDataCard.defaultProps = {
     title: 'Table data',
-    csv_data: [],
 };
 
 export default TableCsvDataCard;

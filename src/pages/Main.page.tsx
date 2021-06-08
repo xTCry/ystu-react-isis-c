@@ -10,10 +10,8 @@ import FileManagerCard from '../components/cards/FileManager-card.component';
 import TableCsvDataCard from '../components/cards/TableCsvData-card.component';
 
 import { useDebounce } from '../utils/debounceHook-react.util';
-import { csv_data } from '../utils/inputData.util';
 
 const MainPage = () => {
-    const [data,setCsvData] = React.useState(() => csv_data);
     const [prediction, setPrediction] = useDebounce(5, 300);
     const [smoothLevel, setSmoothLevel] = useDebounce(3, 300);
 
@@ -24,14 +22,14 @@ const MainPage = () => {
             </Row>
             <Row>
                 <Col lg="9" md="9" sm="12" className="mb-4">
-                    <ChartCard csv_data={data} prediction={prediction} smoothLevel={smoothLevel} />
+                    <ChartCard prediction={prediction} smoothLevel={smoothLevel} />
                     <SlidersCard changePrediction={setPrediction} changeSmoothLevel={setSmoothLevel} />
-                    <PivotTableCard data={data} />
+                    <PivotTableCard />
                 </Col>
                 <Col lg="3" className="mb-4">
                     <FileManagerCard />
-                    <ChartInfoCard />
-                    <TableCsvDataCard csv_data={data} setCsvData={setCsvData} />
+                    {/* <ChartInfoCard /> */}
+                    <TableCsvDataCard />
                 </Col>
             </Row>
         </Container>

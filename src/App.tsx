@@ -3,16 +3,12 @@ import { HashRouter as Router } from 'react-router-dom';
 import { Switch, Route, Redirect } from 'react-router';
 import { Container, Row, Col } from 'shards-react';
 
-import Home from './pages/Home';
 import MainPage from './pages/Main.page';
-import { Process } from './pages/Process';
 
 import TableEditor from './components/editor/Table.editor';
 import MainNavbar from './components/common/MainNavbar.component';
 import MainSidebar from './components/common/MainSidebar.component';
 import MainFooter from './components/common/MainFooter.component';
-
-import { csv_data } from './utils/inputData.util';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 // import "shards-ui/dist/css/shards.min.css"
@@ -40,24 +36,21 @@ const DefaultLayout = ({ children }) => {
         </Container>
     );
 }
+
 const App = () => (
     <Router>
         <DefaultLayout>
             <Switch>
-                <Route exact path="/" component={Home} />
                 <Route path="/main">
                     <MainPage />
                 </Route>
 
-                <Route path="/proecess">
-                    <Process data={csv_data} />
-                </Route>
                 <Route exact path="/edit">
-                    <TableEditor data={csv_data} />
+                    <TableEditor />
                 </Route>
 
                 <Route path="*">
-                    <Redirect to="/" />
+                    <Redirect to="/main" />
                 </Route>
             </Switch>
         </DefaultLayout>

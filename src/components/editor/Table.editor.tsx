@@ -9,6 +9,7 @@ import {
     TableEditColumn,
     TableInlineCellEditing,
 } from '@devexpress/dx-react-grid-material-ui';
+import { useCsvData } from '../csvData-context.component';
 // import debounce from 'lodash.debounce';
 
 const ruleRequired = (value) => String(value)?.trim().length > 0 || 'This field is required';
@@ -51,11 +52,10 @@ const validate = (changed, validationStatus) =>
         return { ...status, [id]: rowStatus };
     }, {});
 
-const TableEditor = (props: { data: { x: number; y: number }[]; setData?: Function }) => {
-    const [_data, _setData] = React.useState(props.data);
-    const [data, setData] = props.setData ? [props.data, props.setData] : [_data, _setData];
+const TableEditor = () => {
+    const { csvData, setCsvData } = useCsvData();
 
-    const [rows, setRows] = useState(data.map((e, i) => ({ id: i, ...e })));
+    const [rows, setRows] = useState([]);
     const [editingCells, setEditingCells] = useState([]);
 
     const commitChanges = ({ added, changed, deleted }: { added?: any[]; changed?: any[]; deleted?: any[] }) => {
@@ -82,8 +82,10 @@ const TableEditor = (props: { data: { x: number; y: number }[]; setData?: Functi
             }))
             .sort((a, b) => a.x - b.x);
 
+        console.log('new tabele edit result', result);
+
         setRows(result);
-        setData(result.map(({ x, y }) => ({ x, y })));
+        setCsvData(result.map(({ x, y }) => ({ x, y })));
     };
     const addEmptyRow = () => commitChanges({ added: [{ x: 0, y: 0 }] });
 
@@ -106,6 +108,10 @@ const TableEditor = (props: { data: { x: number; y: number }[]; setData?: Functi
         },
         [validationStatus]
     );
+
+    React.useEffect(() => {
+        setRows(csvData.map((e, i) => ({ id: i, ...e })));
+    }, [csvData]);
 
     return (
         <Paper>

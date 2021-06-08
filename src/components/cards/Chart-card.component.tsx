@@ -2,8 +2,10 @@ import React from 'react';
 import { Row, Col, Card, CardHeader, CardBody, CardFooter, FormCheckbox, ButtonGroup } from 'shards-react';
 import { ChartRegressions } from 'chartjs-plugin-regression';
 import { Variant7 } from '../variants/Variant7';
+import { useCsvData } from '../csvData-context.component';
 
-const ChartCard = ({ csv_data, ...props }) => {
+const ChartCard = (props) => {
+    const { csvData } = useCsvData();
     const chart = React.useRef(null);
     const [isLockRegressionsTypes, setLockRegressionsTypes] = React.useState(false);
     const [isDisplayAllRegressionsTypes, setDisplayAllRegressionsTypes] = React.useState(false);
@@ -113,7 +115,7 @@ const ChartCard = ({ csv_data, ...props }) => {
                     </Col>
                 </Row>
                 <Variant7
-                    data={csv_data}
+                    data={csvData}
                     regressionsTypes={Object.entries(regressionsTypes)
                         .filter(([, e]) => e)
                         .map(([e]) => e)}

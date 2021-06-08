@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardHeader, CardBody, CardFooter, Row, Col } from 'shards-react';
+import { Card, CardHeader, CardBody } from 'shards-react';
 import * as pivotUtil from '../../utils/pivot.util';
+import { useCsvData } from '../csvData-context.component';
 
-const PivotTableCard = ({ title, data }) => {
-    const xValues = data.map((e) => e.x).filter((e) => typeof e === 'number');
-    const yValues = data.map((e) => e.y).filter((e) => typeof e === 'number');
+const PivotTableCard = ({ title }) => {
+    const { csvData } = useCsvData();
+    const xValues = csvData.map((e) => e.x).filter((e) => typeof e === 'number');
+    const yValues = csvData.map((e) => e.y).filter((e) => typeof e === 'number');
 
     return (
         <Card>
@@ -42,31 +44,25 @@ const PivotTableCard = ({ title, data }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {Object.values(pivotUtil.methods).map((method) => {
-                            const { name, formula, dOst, r, R, A, f1 } = method(xValues, yValues);
-                            return (
-                                <tr>
-                                    <td>{name}</td>
-                                    <td>{formula}</td>
-                                    <td>{dOst}</td>
-                                    <td>{r}</td>
-                                    <td>{R}</td>
-                                    <td>{A}</td>
-                                    <td>{f1}</td>
-                                </tr>
-                            );
-                        })}
+                        {csvData.length > 0 &&
+                            csvData.reduce((a, { y }) => y + a, 0) > 0 &&
+                            Object.values(pivotUtil.methods).map((method, i) => {
+                                const { name, formula, dOst, r, R, A, f1 } = method(xValues, yValues);
+                                return (
+                                    <tr key={name}>
+                                        <td>{name}</td>
+                                        <td>{formula}</td>
+                                        <td>{dOst}</td>
+                                        <td>{r}</td>
+                                        <td>{R}</td>
+                                        <td>{A}</td>
+                                        <td>{f1}</td>
+                                    </tr>
+                                );
+                            })}
                     </tbody>
                 </table>
             </CardBody>
-
-            {/* <CardFooter className="border-top">
-                <Row>
-                    <Col className="text-right view-report">
-                        <a href="#">View full &rarr;</a>
-                    </Col>
-                </Row>
-            </CardFooter> */}
         </Card>
     );
 };
@@ -76,15 +72,10 @@ PivotTableCard.propTypes = {
      * The component's title.
      */
     title: PropTypes.string,
-    /**
-     * The referral data.
-     */
-    data: PropTypes.array,
 };
 
 PivotTableCard.defaultProps = {
     title: 'Pivot Table',
-    data: [],
 };
 
 export default PivotTableCard;
