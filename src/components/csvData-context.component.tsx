@@ -1,5 +1,7 @@
 import React from 'react';
 import { Point } from 'chart.js';
+import { useDispatch, useSelector } from 'react-redux';
+import * as chartActions from '../store/reducer/chart/actions';
 
 type CtxVal = {
     csvData: Point[];
@@ -11,7 +13,11 @@ export const CsvDataContext = React.createContext<CtxVal>(null);
 export const CsvDataProvider = (props) => {
     const { children } = props;
 
-    const [csvData, setCsvData] = React.useState<Point[]>([]);
+    const dispatch = useDispatch();
+    const csvData = useSelector((state) => state.chart.csvData);
+    const setCsvData = React.useCallback((csvData) => dispatch(chartActions.setCsvData(csvData)), [dispatch]);
+
+    // const [csvData, setCsvData] = React.useState<Point[]>([]);
     const value = { csvData, setCsvData };
 
     return <CsvDataContext.Provider value={value} children={children} />;

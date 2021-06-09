@@ -5,20 +5,20 @@ import { LineWithErrorBarsController as ErrorBarsController } from 'chartjs-char
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { ChartRegressions } from 'chartjs-plugin-regression';
 
-import * as formulasUtil from '../../utils/formulas.util';
 import ChartComponent from '../Chart.component';
+import { useCsvData } from '../csvData-context.component';
+import * as formulasUtil from '../../utils/formulas.util';
 
 Chart.register(ErrorBarsController, zoomPlugin, ChartRegressions);
 
 const useChartData = ({
-    data: csvDataP,
     prediction: predictionP,
     smoothLevel: smoothLevelP,
 }: {
-    data: Point[];
     prediction?: number;
     smoothLevel?: number;
 }) => {
+    const { csvData: csvDataP } = useCsvData();
     const [sigmaMult] = React.useState(3);
 
     const [csvData, setCsvData] = React.useState(csvDataP);
@@ -70,7 +70,6 @@ const useChartData = ({
         setDataPredictionLen(dataPredictionLength);
     }, [csvData, predictionP, setDataPredictionLen]);
 
-
     React.useEffect(() => {
         setSmoothDataY(formulasUtil.createSmoothData(csvData, smoothLevelP));
 
@@ -98,34 +97,22 @@ const useChartData = ({
     };
 };
 
-export const Variant7 = (props: {
-    data: Point[];
+const Variant7 = (props: {
     prediction?: number;
     smoothLevel?: number;
     overwriteData?: 'all' | 'none' | 'last';
-    regressionsTypes: any;
+    regressionsTypes?: any[];
     isDisplayAllRegressionsTypes: boolean;
     chart: any;
+    onRegressionResults?: Function;
 }) => {
-    const [responsive, setResponsive] = React.useState(true);
+    const { newData, dataLength, smartLabels, smoothDataY, sigmaMult, std, roman, sigma } = useChartData(props);
 
-    const {
-        newData,
-        dataLength,
-        dataPredictLength,
-        smartLabels,
-        smoothDataY,
-        sigmaMult,
-        csvData,
-        std,
-        std20,
-        roman,
-        sigma,
-    } = useChartData(props);
+    console.log('redraw char var7');
 
     const mode = 'x';
     const options = {
-        responsive,
+        responsive: true,
         interaction: {
             mode,
             intersect: false,
@@ -142,18 +129,18 @@ export const Variant7 = (props: {
                 },
 
                 // TODO: fix this!
-                // zoom: {
-                //     mode,
-                //     wheel: {
-                //         enabled: true,
-                //     },
-                //     pinch: {
-                //         enabled: true,
-                //     },
-                //     onZoomComplete({ chart }) {
-                //         chart.update();
-                //     },
-                // },
+                zoom: {
+                    mode,
+                    wheel: {
+                        enabled: true,
+                    },
+                    pinch: {
+                        enabled: true,
+                    },
+                    onZoomComplete({ chart }) {
+                        chart.update();
+                    },
+                },
 
                 limits: {
                     // y: {
@@ -221,7 +208,7 @@ export const Variant7 = (props: {
                   backgroundColor: 'rgba(120,120,120,0.3)',
 
                   regressions: {
-                      type: props.regressionsTypes,
+                      type: props.regressionsTypes || ['linear'],
                       line: { color: 'blue', width: 3 },
                       extendPredictions: true,
                       sections: [
@@ -398,29 +385,20 @@ export const Variant7 = (props: {
         ],
     };
 
-    const onKek = React.useCallback(() => {}, []);
-
-    const lineChart = React.useMemo(
-        () => <ChartComponent ref={props.chart} id="smart-chart" plugins={[ChartRegressions]} data={dataRomanAndSigma} options={options} />,
-        [dataRomanAndSigma]
-    );
-
-    return lineChart;
+    // const lineChart = React.useMemo(
+    //     () => <ChartComponent ref={props.chart} id="smart-chart" plugins={[ChartRegressions]} data={dataRomanAndSigma} options={options} />,
+    //     [dataRomanAndSigma]
+    // );
 
     return (
-        <>
-            <button onClick={() => setResponsive(!responsive)}>Toggle responsive</button>
-            <button onClick={() => onKek()}>KEK+</button>
-            <hr />
-            <pre>
-                std = <b>{std}</b>
-                <br />
-                std * {sigmaMult} = <b>{std * sigmaMult}</b>
-            </pre>
-
-            <h1>romanOf & sigma</h1>
-            {lineChart}
-            <hr />
-        </>
+        <ChartComponent
+            ref={props.chart}
+            id="smart-chart"
+            plugins={[ChartRegressions]}
+            data={dataRomanAndSigma}
+            options={options}
+        />
     );
 };
+
+export default React.memo(Variant7);
