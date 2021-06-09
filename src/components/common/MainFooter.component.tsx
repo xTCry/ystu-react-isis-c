@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Container, Row, Nav, NavItem, NavLink } from 'shards-react';
+import packageJson from '../../../package.json';
 
 const MainFooter = ({ contained, menuItems, copyright }) => (
     <footer className="main-footer d-flex p-2 px-3 bg-white border-top">
@@ -15,7 +16,7 @@ const MainFooter = ({ contained, menuItems, copyright }) => (
                         </NavItem>
                     ))}
                 </Nav>
-                <span className="copyright ml-auto my-auto mr-2">{copyright}</span>
+                <span className="copyright ml-auto my-auto mr-2">{copyright} - v{packageJson.version}</span>
             </Row>
         </Container>
     </footer>
