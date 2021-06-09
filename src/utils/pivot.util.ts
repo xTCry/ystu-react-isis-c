@@ -98,7 +98,7 @@ export function calcParab(xValues = [], yValues = [], decimal = 2) {
             f1: null,
         };
     }
-    console.log('xValues len', xValues, yValues);
+    // console.log('[calcParab] values x:y', xValues, yValues);
 
     var power = 2;
     try {

@@ -50,25 +50,3 @@ export const createSmoothData = (data, smoothValue = 3) => {
     result.push(data[data.length - 1]);
     return result;
 };
-
-/* const isSmall = !1;
-let result = ((data) => {
-    const sigmaMult = 1.5;
-
-    const yArr = data.map((e) => e.y).slice(0, isSmall ? 3 : -1);
-
-    const std = stdCalc(yArr);
-    console.log('std', yArr.join(), std);
-
-    const roman = Roman(yArr, std);
-    console.log('roman', yArr.join(), roman);
-
-    const sigma = Sigma(yArr, std, sigmaMult);
-
-    console.log('sigma', yArr.join(), sigma);
-    console.log('std mult', std * sigmaMult);
-
-    return data.map(e=> `${e.x};${e.y}`);
-})(csv_data.slice(0, isSmall ? 20 : -1));
-
-console.log(result); */

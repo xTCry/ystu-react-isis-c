@@ -1,26 +1,41 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useDebounce } from 'react-use';
 import { Card, CardHeader, ListGroup, ListGroupItem, Slider } from 'shards-react';
+
 import { declOfNum } from '../../utils/other.util';
+import * as chartActions from '../../store/reducer/chart/actions';
 
-const SlidersCard = ({ changePrediction, changeSmoothLevel }) => {
-    const [predictionYear, setPredictionYear] = React.useState(5);
-    const [smoothLevel, setSmoothLevel] = React.useState(3);
+const SlidersCard = () => {
+    const dispatch = useDispatch();
+    const [prediction, setPrediction] = React.useState(useSelector((s) => s.chart.prediction));
+    const [smoothLevel, setSmoothLevel] = React.useState(useSelector((s) => s.chart.smoothLevel));
 
-    const handleSlidePredictionYears = React.useCallback(([start, end]) => {
-        setPredictionYear(parseFloat(start));
+    const handleSlidePrediction = React.useCallback(([start, end]) => {
+        setPrediction(parseFloat(start));
     }, []);
 
     const handleSlideSmoothLevel = React.useCallback(([start, end]) => {
         setSmoothLevel(parseFloat(start));
     }, []);
 
-    React.useEffect(() => {
-        changePrediction?.(predictionYear);
-    }, [predictionYear, changePrediction]);
+    useDebounce/* Effect */(
+        (_prediction) => {
+            dispatch(chartActions.setPrediction(prediction));
+        },
+        300,
+        [prediction],
+        // prediction,
+    );
 
-    React.useEffect(() => {
-        changeSmoothLevel?.(smoothLevel);
-    }, [smoothLevel, changeSmoothLevel]);
+    useDebounce/* Effect */(
+        (_smoothLevel) => {
+            dispatch(chartActions.setSmoothLevel(smoothLevel));
+        },
+        300,
+        [smoothLevel],
+        // smoothLevel,
+    );
 
     return (
         <Card small className="mb-4">
@@ -31,13 +46,13 @@ const SlidersCard = ({ changePrediction, changeSmoothLevel }) => {
                 <ListGroupItem className="px-4">
                     <div className="mb-5">
                         <strong className="text-muted d-block">
-                            Прогноз на {predictionYear} {declOfNum(predictionYear, ['год', 'года', 'лет'])} вперед
+                            Прогноз на {prediction} {declOfNum(prediction, ['год', 'года', 'лет'])} вперед
                         </strong>
                         <Slider
                             theme="info"
                             className="my-3"
-                            start={[predictionYear]}
-                            onSlide={handleSlidePredictionYears}
+                            start={[prediction]}
+                            onSlide={handleSlidePrediction}
                             step={1}
                             range={{ min: 0, max: 50 }}
                             connect={[true, false]}

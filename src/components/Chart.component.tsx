@@ -1,4 +1,5 @@
 import React from 'react';
+import { usePrevious } from 'react-use';
 import { Chart, ChartData } from 'chart.js';
 
 import merge from 'lodash/merge';
@@ -11,7 +12,66 @@ type Props = {
     [key: string]: any;
 };
 
-const ChartComponent = React.forwardRef<Chart | undefined, Props>((props, ref) => {
+const isDeepEqual = (data, prevData) => {
+    let eq: any = true;
+    if (data === prevData) return true;
+
+    if (data && prevData) {
+        if (typeof data === 'object' && typeof prevData === 'object') {
+            if (data.constructor !== prevData.constructor) return (eq = 1), eq;
+
+            let length, i, keys;
+            if (Array.isArray(data)) {
+                length = data.length;
+                if (length != prevData.length) return (eq = 2), eq;
+                for (i = length; i-- !== 0; )
+                    if ((eq = isDeepEqual(data[i], prevData[i]) !== true)) return (eq = eq + 100), eq;
+                return (eq = 4), eq;
+            }
+
+            if (data.constructor === RegExp)
+                return (eq = (data.source === prevData.source && data.flags === prevData.flags) || 5), eq;
+            if (data.valueOf !== Object.prototype.valueOf) return (eq = data.valueOf() === prevData.valueOf() || 6), eq;
+            if (data.toString !== Object.prototype.toString)
+                return (eq = data.toString() === prevData.toString() || 7), eq;
+
+            keys = Object.keys(data);
+            length = keys.length;
+            if (length !== Object.keys(prevData).length) return (eq = 8), eq;
+
+            for (i = length; i-- !== 0; ) {
+                if (!Object.prototype.hasOwnProperty.call(prevData, keys[i])) return (eq = 9), eq;
+            }
+
+            for (i = length; i-- !== 0; ) {
+                const key = keys[i];
+
+                if (key === '_owner' && data.$$typeof) {
+                    // React-specific: avoid traversing React elements' _owner.
+                    //  _owner contains circular references
+                    // and is not needed when comparing the actual elements (and not their owners)
+                    continue;
+                }
+
+                if ((eq = isDeepEqual(data[key], prevData[key])) !== true) return (eq = eq + 200), eq;
+            }
+
+            return true;
+        } else if (typeof data === 'function' && typeof prevData === 'function') {
+            if (data.toString === Function.prototype.toString) {
+                return (eq = data.toString() === prevData.toString() || 11), eq;
+            }
+            return true;
+        }
+    }
+
+    // true if both NaN, false otherwise
+    return (eq = (data !== data && prevData !== prevData) || 12), eq;
+};
+
+export type ChartDataRef = { chart: Chart | undefined; data: ChartData };
+
+const ChartComponent = React.forwardRef<ChartDataRef, Props>((props, ref) => {
     const {
         type = 'line',
         plugins = [],
@@ -38,8 +98,14 @@ const ChartComponent = React.forwardRef<Chart | undefined, Props>((props, ref) =
     }, [data, canvas.current]);
 
     const [chart, setChart] = React.useState<Chart>();
+    const prevComputedData = usePrevious(computedData);
+    const prevOptions = usePrevious(options);
 
-    React.useImperativeHandle<Chart | undefined, Chart | undefined>(ref, () => chart, [chart]);
+    React.useImperativeHandle<ChartDataRef, ChartDataRef>(
+        ref,
+        () => ({ chart, data: computedData }),
+        [chart, data]
+    );
 
     const renderChart = () => {
         if (!canvas.current) return;
@@ -142,15 +208,21 @@ const ChartComponent = React.forwardRef<Chart | undefined, Props>((props, ref) =
     }, []);
 
     React.useEffect(() => {
+        let eq: any = 'none';
+        let eq2: any = 'none';
         if (redraw) {
             destroyChart();
             setTimeout(() => {
                 renderChart();
             }, 0);
-        } else {
+        } else if (
+            (eq = isDeepEqual(JSON.stringify(prevComputedData), JSON.stringify(computedData))) !== true ||
+            (eq2 = isDeepEqual(prevOptions, options)) !== true
+        ) {
+            // console.log('not isDeepEqual eqs', eq, eq2, options);
             updateChart();
         }
-    }, [props, computedData]);
+    }, [/* props, */ options, redraw, computedData, prevComputedData]);
 
     return (
         <canvas

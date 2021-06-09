@@ -9,7 +9,7 @@ import {
     TableEditColumn,
     TableInlineCellEditing,
 } from '@devexpress/dx-react-grid-material-ui';
-import { useCsvData } from '../csvData-context.component';
+import { useChartData } from '../chartData-context.component';
 // import debounce from 'lodash.debounce';
 
 const ruleRequired = (value) => String(value)?.trim().length > 0 || 'This field is required';
@@ -53,7 +53,7 @@ const validate = (changed, validationStatus) =>
     }, {});
 
 const TableEditor = () => {
-    const { csvData, setCsvData } = useCsvData();
+    const { chartData, setChartData } = useChartData();
 
     const [rows, setRows] = useState([]);
     const [editingCells, setEditingCells] = useState([]);
@@ -85,7 +85,7 @@ const TableEditor = () => {
         console.log('new tabele edit result', result);
 
         setRows(result);
-        setCsvData(result.map(({ x, y }) => ({ x, y })));
+        setChartData(result.map(({ x, y }) => ({ x, y })));
     };
     const addEmptyRow = () => commitChanges({ added: [{ x: 0, y: 0 }] });
 
@@ -110,8 +110,8 @@ const TableEditor = () => {
     );
 
     React.useEffect(() => {
-        setRows(csvData.map((e, i) => ({ id: i, ...e })));
-    }, [csvData]);
+        setRows(chartData.map((e, i) => ({ id: i, ...e })));
+    }, [chartData]);
 
     return (
         <Paper>

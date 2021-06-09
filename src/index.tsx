@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 
 import App from './App';
-import { CsvDataProvider } from './components/csvData-context.component';
+import { ChartDataProvider } from './components/chartData-context.component';
 
 import store from './store/configureStore';
 import reportWebVitals from './reportWebVitals';
@@ -11,9 +11,9 @@ import reportWebVitals from './reportWebVitals';
 ReactDOM.render(
     <React.StrictMode>
         <Provider store={store}>
-            <CsvDataProvider>
+            <ChartDataProvider>
                 <App />
-            </CsvDataProvider>
+            </ChartDataProvider>
         </Provider>
     </React.StrictMode>,
     document.getElementById('root')

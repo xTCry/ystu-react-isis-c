@@ -1,11 +1,15 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
 import { ChartRegressions } from 'chartjs-plugin-regression';
 import { Row, Col, Card, CardHeader, CardBody, CardFooter, FormCheckbox, ButtonGroup } from 'shards-react';
 
-import Variant7 from '../variants/Variant7';
+import Variant7, { DatasetName } from '../variants/Variant7';
+import * as chartActions from '../../store/reducer/chart/actions';
 
-const ChartCard = (props) => {
-    const chart = React.useRef(null);
+const ChartCard = () => {
+    const chartData = React.useRef({ chart: null, data: null });
+    const dispatch = useDispatch();
+
     const [isLockRegressionsTypes, setLockRegressionsTypes] = React.useState(false);
     const [isDisplayAllRegressionsTypes, setDisplayAllRegressionsTypes] = React.useState(false);
     const [regressionsTypes, setRegressionsTypes] = React.useState({
@@ -13,39 +17,41 @@ const ChartCard = (props) => {
         exponential: true,
         polynomial: true,
     });
-    const [regressionsResults, setRegressionsResults] = React.useState([]);
+    const regressionsTypesArr = React.useMemo(
+        () =>
+            Object.entries(regressionsTypes)
+                .filter(([, e]) => e)
+                .map(([e]) => e),
+        [regressionsTypes]
+    );
+    const [regressionsResults, setRegressionsResults] = React.useState<any>({});
 
-    const timeIntervalRef = React.useRef(null);
     const onRegressionResults = React.useCallback(() => {
-        if (!chart.current) return;
+        if (!chartData.current.chart) return;
+
         const maxDatasets = 10;
-        let results = [];
+        let results = {};
         for (let i = 0; i < maxDatasets; ++i) {
-            const sections = ChartRegressions.getSections(chart.current, i);
+            const sections = ChartRegressions.getSections(chartData.current.chart, i);
             sections?.forEach((section) => {
-                if (section.result.r2) {
-                    let result = {
-                        type: (section.result as any).type,
+                const name = (
+                    ((section as any)._meta.dataset.name as DatasetName)?.toString().split('regression')[1] as string
+                ).toLowerCase();
+                if (section.result.r2 && name && regressionsTypes[name]) {
+                    results[name] = {
+                        type: section.result.type,
                         string: section.result.string,
                         color: section.line.color,
                         equation: [...section.result.equation],
-                        r2: Math.round(section.result.r2 * 1000) / 10 + '%',
+                        r2: Math.round(section.result.r2 * 1e3) / 10 + '%',
                     };
-                    results.push(result);
                 }
             });
         }
+
+        // dispatch(chartActions.setRegressionData(results));
         setRegressionsResults(results);
-    }, []);
-
-    React.useEffect(()=>{
-        timeIntervalRef.current && clearTimeout(timeIntervalRef.current);
-        timeIntervalRef.current = setInterval(onRegressionResults, 1e3);
-
-        return () => {
-            timeIntervalRef.current && clearInterval(timeIntervalRef.current);
-        };
-    },[])
+    }, [regressionsTypes]);
 
     const handleChangeRegressionsTypes = React.useCallback((e, name) => {
         setRegressionsTypes((state) => ({
@@ -58,6 +64,10 @@ const ChartCard = (props) => {
         setLockRegressionsTypes(Object.values(regressionsTypes).filter(Boolean).length === 1);
     }, [regressionsTypes, setLockRegressionsTypes]);
 
+    React.useEffect(() => {
+        (window as any).chartData = () => chartData.current;
+    }, [chartData.current]);
+
     const radios = [
         { name: 'Linear', value: 'linear' },
         { name: 'Exponential', value: 'exponential' },
@@ -65,7 +75,6 @@ const ChartCard = (props) => {
     ];
 
     return (
-        // <Card small className="h-100">
         <Card small className="mb-4">
             <CardHeader className="border-bottom">
                 <h6 className="m-0">Smart Chart</h6>
@@ -114,12 +123,10 @@ const ChartCard = (props) => {
                     </Col>
                 </Row>
                 <Variant7
-                    // regressionsTypes={Object.entries(regressionsTypes)
-                    //     .filter(([, e]) => e)
-                    //     .map(([e]) => e)}
+                    regressionsTypes={regressionsTypesArr}
+                    onRegressionResults={onRegressionResults}
                     isDisplayAllRegressionsTypes={isDisplayAllRegressionsTypes}
-                    chart={chart}
-                    {...(props as any)}
+                    chart={chartData}
                 />
             </CardBody>
             <CardFooter className="border-top">
@@ -127,13 +134,14 @@ const ChartCard = (props) => {
                     <Col>
                         <table className="table mb-0">
                             <tbody className="bg-light">
-                                {regressionsResults.map((result, i) => (
-                                    <tr key={i} style={{ color: result.color }}>
-                                        <td>{result.type}</td>
-                                        <td>R² = {result.r2}</td>
-                                        <td>{result.string}</td>
-                                    </tr>
-                                ))}
+                                {isDisplayAllRegressionsTypes && // выводить, только когда включены все (фича)
+                                    Object.entries(regressionsResults).map(([name, result]: any) => (
+                                        <tr key={name} style={{ color: result.color }}>
+                                            <td>{result.type}</td>
+                                            <td>R² = {result.r2}</td>
+                                            <td>{result.string}</td>
+                                        </tr>
+                                    ))}
                             </tbody>
                         </table>
                     </Col>
@@ -143,4 +151,3 @@ const ChartCard = (props) => {
     );
 };
 export default React.memo(ChartCard);
-  

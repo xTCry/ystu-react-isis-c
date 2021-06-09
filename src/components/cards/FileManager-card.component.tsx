@@ -1,19 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardHeader, CardBody, ListGroup, ListGroupItem, Button } from 'shards-react';
+import { useDispatch, useSelector } from 'react-redux';
 import CSVReader from 'react-csv-reader';
 import { CSVLink } from 'react-csv';
+import { Card, CardHeader, CardBody, ListGroup, ListGroupItem, Button } from 'shards-react';
 import jsPDF from 'jspdf';
 
-import { useCsvData } from '../csvData-context.component';
+import * as chartActions from '../../store/reducer/chart/actions';
 
 const FileManagerCard = ({ title }) => {
-    const { csvData, setCsvData } = useCsvData();
+    const dispatch = useDispatch();
+    const { chartData, fileName } = useSelector((state) => state.chart);
     const [status, setStatus] = React.useState('Blank');
 
-    const [fileName, setFileName] = React.useState<string>(null);
-
-    const save2pdf = React.useCallback(() => {
+    const onSave2pdf = React.useCallback(() => {
         const canvas = document.getElementById('smart-chart') as HTMLCanvasElement;
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF({
@@ -31,6 +31,15 @@ const FileManagerCard = ({ title }) => {
         pdf.save(`${pdfName}.pdf`);
     }, []);
 
+    const onCloseCsv = React.useCallback(() => {
+        (document.getElementById('react-csv-reader-input') as HTMLInputElement).value = null;
+        dispatch(chartActions.close());
+    }, []);
+
+    const onCsvLink = React.useCallback((e) => {
+        dispatch(chartActions.setSaved(true));
+    }, []);
+
     const onLoaded = React.useCallback((_data, fileInfo) => {
         console.log('_data', _data);
         let data = _data
@@ -41,8 +50,9 @@ const FileManagerCard = ({ title }) => {
             .filter(({ y }) => !isNaN(y));
         console.log('loaded & parsed data', data);
 
-        setFileName(fileInfo.name);
-        setCsvData(data);
+        dispatch(chartActions.setChartData(data));
+        dispatch(chartActions.setFileName(fileInfo.name));
+        dispatch(chartActions.loadCsvData(data))
         setStatus('Loaded');
     }, []);
 
@@ -81,26 +91,28 @@ const FileManagerCard = ({ title }) => {
                     <ListGroupItem className="px-3 py-0">
                         <strong className="text-muted d-block mb-2">Load csv file</strong>
                         <div className="custom-file mb-3">
-                            <CSVReader cssInputClass="custom-file-input" onFileLoaded={onLoaded} />
-                            <label className="custom-file-label" htmlFor="custom-file-label">
+                            <CSVReader cssInputClass="custom-file-input" onFileLoaded={onLoaded} inputId="react-csv-reader-input" />
+                            <label className="custom-file-label" htmlFor="react-csv-reader-input">
                                 {fileName ? `Loaded ${fileName}` : 'Choose csv file...'}
                             </label>
                         </div>
                     </ListGroupItem>
 
-                    {csvData.length > 0 && (
-                        <ListGroupItem className="d-flex px-3 border-0">
-                            <Button theme="primary" size="sm" onClick={save2pdf}>
-                                <i className="material-icons">save</i> Save as PDF
-                            </Button>
+                    <ListGroupItem disabled={chartData.length== 0} className="d-flex px-3 border-0">
+                        <Button theme="primary" size="sm" onClick={onSave2pdf}>
+                            <i className="material-icons">save</i> Save as PDF
+                        </Button>
 
-                            <CSVLink data={csvData.map(({ x, y }) => [x, y])} className="ml-auto">
-                                <Button theme="secondary" size="sm">
-                                    <i className="material-icons">file_copy</i> Save New csv data
-                                </Button>
-                            </CSVLink>
-                        </ListGroupItem>
-                    )}
+                        <Button theme="secondary" outline size="sm" onClick={onCloseCsv} className="ml-auto">
+                            <i className="material-icons">close</i> Close
+                        </Button>
+
+                        <CSVLink disabled={chartData.length== 0} onClick={onCsvLink} data={chartData.map(({ x, y }) => [x, y])} className="ml-auto">
+                            <Button theme="secondary" size="sm">
+                                <i className="material-icons">file_copy</i> Save New csv data
+                            </Button>
+                        </CSVLink>
+                    </ListGroupItem>
                 </ListGroup>
             </CardBody>
         </Card>

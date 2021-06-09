@@ -1,29 +1,41 @@
 import React from 'react';
-import { Chart, ChartData, Point, Tooltip } from 'chart.js';
+import { Chart, ChartData, Tooltip } from 'chart.js';
 import 'react-chartjs-2';
 import { LineWithErrorBarsController as ErrorBarsController } from 'chartjs-chart-error-bars';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { ChartRegressions } from 'chartjs-plugin-regression';
 
 import ChartComponent from '../Chart.component';
-import { useCsvData } from '../csvData-context.component';
 import * as formulasUtil from '../../utils/formulas.util';
+import { useSelector } from 'react-redux';
 
 Chart.register(ErrorBarsController, zoomPlugin, ChartRegressions);
 
-const useChartData = ({
-    prediction: predictionP,
-    smoothLevel: smoothLevelP,
-}: {
-    prediction?: number;
-    smoothLevel?: number;
-}) => {
-    const { csvData: csvDataP } = useCsvData();
-    const [sigmaMult] = React.useState(3);
+export enum DatasetName {
+    Original,
+    Roman,
+    RomanPlus,
+    RomanMinus,
+    Sigma,
+    SigmaPlus,
+    Smooth,
 
-    const [csvData, setCsvData] = React.useState(csvDataP);
-    const [dataPredictionLength, setDataPredictionLen] = React.useState(csvData.length + (predictionP || 0));
-    const [smoothLevel, setSmoothLevel] = React.useState(smoothLevelP);
+    RegressionSmart = 'regressionSmart',
+    RegressionLinear = 'regressionLinear',
+    RegressionExponential = 'regressionExponential',
+    RegressionPolynomial = 'regressionPolynomial',
+}
+
+declare module 'chart.js' {
+    interface ChartDatasetProperties<TType extends ChartType, TData> {
+        name?: DatasetName;
+    }
+}
+
+const useChartData = () => {
+    const { prediction, smoothLevel, chartData, sigmaMult } = useSelector((s) => s.chart);
+
+    const [dataPredictionLength, setDataPredictionLen] = React.useState(chartData.length + (prediction || 0));
 
     const [yArr, setYArr] = React.useState([]);
     const [std, set_std] = React.useState(0);
@@ -37,9 +49,8 @@ const useChartData = ({
     const [smoothDataY, setSmoothDataY] = React.useState([]);
 
     React.useEffect(() => {
-        setYArr(csvDataP.map((e) => e.y));
-        setCsvData(csvDataP);
-    }, [csvDataP, setCsvData]);
+        setYArr(chartData.map((e) => e.y));
+    }, [chartData]);
 
     React.useEffect(() => {
         set_std(formulasUtil.stdCalc(yArr));
@@ -50,12 +61,12 @@ const useChartData = ({
         set_roman(formulasUtil.Roman(yArr.slice(0, 20), std20));
     }, [std20]);
     React.useEffect(() => {
-        set_sigma(formulasUtil.Sigma(yArr, std));
-    }, [std]);
+        set_sigma(formulasUtil.Sigma(yArr, std, sigmaMult));
+    }, [std, sigmaMult]);
 
     React.useEffect(() => {
-        const dataPredictionLength = csvData.length + predictionP;
-        setNewData(new Array(dataPredictionLength).fill(0).map((v, i) => (i >= dataLength ? null : csvData[i].y)));
+        const dataPredictionLength = chartData.length + prediction;
+        setNewData(new Array(dataPredictionLength).fill(0).map((v, i) => (i >= dataLength ? null : chartData[i].y)));
 
         let lastLabel = null;
         setSmartLabels(
@@ -68,17 +79,15 @@ const useChartData = ({
         );
 
         setDataPredictionLen(dataPredictionLength);
-    }, [csvData, predictionP, setDataPredictionLen]);
+    }, [chartData, prediction, setDataPredictionLen]);
 
     React.useEffect(() => {
-        setSmoothDataY(formulasUtil.createSmoothData(csvData, smoothLevelP));
+        setSmoothDataY(formulasUtil.createSmoothData(chartData, smoothLevel));
+    }, [chartData, smoothLevel, setSmoothDataY]);
 
-        setSmoothLevel(smoothLevelP);
-    }, [csvData, smoothLevelP, setSmoothDataY]);
+    const labels = chartData.map((e) => e.x);
 
-    const labels = csvData.map((e) => e.x);
-
-    const dataLength = csvData.length;
+    const dataLength = chartData.length;
 
     return {
         newData,
@@ -89,7 +98,7 @@ const useChartData = ({
         smoothLevel,
 
         sigmaMult,
-        csvData,
+        chartData,
         std,
         std20,
         roman,
@@ -98,17 +107,14 @@ const useChartData = ({
 };
 
 const Variant7 = (props: {
-    prediction?: number;
-    smoothLevel?: number;
     overwriteData?: 'all' | 'none' | 'last';
     regressionsTypes?: any[];
-    isDisplayAllRegressionsTypes: boolean;
+    isDisplayAllRegressionsTypes?: boolean;
     chart: any;
     onRegressionResults?: Function;
 }) => {
-    const { newData, dataLength, smartLabels, smoothDataY, sigmaMult, std, roman, sigma } = useChartData(props);
-
-    console.log('redraw char var7');
+    const { newData, dataLength, smartLabels, smoothDataY, sigmaMult, std, roman, sigma, smoothLevel } = useChartData();
+    // console.log('redraw char var7');
 
     const mode = 'x';
     const options = {
@@ -174,7 +180,7 @@ const Variant7 = (props: {
                 },
             },
             regressions: {
-                // onCompleteCalculation: (c) => props.onRegressionResults?.(c),
+                onCompleteCalculation: (c) => props.onRegressionResults?.(c),
             },
         },
         animations: {
@@ -200,6 +206,7 @@ const Variant7 = (props: {
     const regressionDataset: ChartData['datasets'] = !props.isDisplayAllRegressionsTypes
         ? [
               {
+                  name: DatasetName.RegressionSmart,
                   label: 'ys (full)',
                   data: newData,
                   fill: false,
@@ -227,6 +234,7 @@ const Variant7 = (props: {
           ]
         : [
               {
+                  name: DatasetName.RegressionLinear,
                   label: 'Regression (linear)',
                   data: newData,
                   fill: false,
@@ -252,6 +260,7 @@ const Variant7 = (props: {
                   },
               },
               {
+                name: DatasetName.RegressionExponential,
                   label: 'Regression (exponential)',
                   data: newData,
                   fill: false,
@@ -277,6 +286,7 @@ const Variant7 = (props: {
                   },
               },
               {
+                name: DatasetName.RegressionPolynomial,
                   label: 'Regression (polynomial)',
                   data: newData,
                   fill: false,
@@ -309,7 +319,8 @@ const Variant7 = (props: {
             // Roman
             {
                 type: ErrorBarsController.id,
-                label: '# of Years (Roman)',
+                name: DatasetName.Roman,
+                label: '# Data (by Romanovskiy)',
                 data: roman.map((e) => ({
                     ...e,
                     yMin: e.y - e.beta,
@@ -325,8 +336,8 @@ const Variant7 = (props: {
                 // tension: 0.5,
             },
             {
-                // type: 'line',
-                label: '# of Years (Roman +)',
+                name: DatasetName.RomanPlus,
+                label: '# Data (by Romanovskiy +)',
                 data: roman.map((e) => e.y + e.beta),
                 fill: false,
                 backgroundColor: 'rgb(255, 99, 140, 0.5)',
@@ -334,8 +345,8 @@ const Variant7 = (props: {
                 tension: 0.5,
             },
             {
-                // type: 'line',
-                label: '# of Years (Roman -)',
+                name: DatasetName.RomanMinus,
+                label: '# Data (by Romanovskiy -)',
                 data: roman.map((e) => e.y - e.beta),
                 fill: 1,
                 backgroundColor: 'rgb(20, 90, 110, 0.5)',
@@ -346,6 +357,7 @@ const Variant7 = (props: {
             // Sigma
             {
                 hidden: true,
+                name: DatasetName.Sigma,
                 type: ErrorBarsController.id,
                 label: '# of Years (Sigma)',
                 data: sigma.map((e) => ({
@@ -361,6 +373,7 @@ const Variant7 = (props: {
             },
             {
                 hidden: true,
+                name: DatasetName.SigmaPlus,
                 label: '# of Years (Sigma +)',
                 data: sigma.map((e) => e.y + e.beta),
                 fill: '-1',
@@ -372,7 +385,8 @@ const Variant7 = (props: {
 
             // smooth
             {
-                label: `ys (smooth=${props.smoothLevel})`,
+                name: DatasetName.Smooth,
+                label: `Smooth data (lvl=${smoothLevel})`,
                 data: smoothDataY,
                 showLine: true,
                 backgroundColor: 'rgb(255, 99, 132)',
@@ -384,11 +398,6 @@ const Variant7 = (props: {
             ...regressionDataset,
         ],
     };
-
-    // const lineChart = React.useMemo(
-    //     () => <ChartComponent ref={props.chart} id="smart-chart" plugins={[ChartRegressions]} data={dataRomanAndSigma} options={options} />,
-    //     [dataRomanAndSigma]
-    // );
 
     return (
         <ChartComponent
