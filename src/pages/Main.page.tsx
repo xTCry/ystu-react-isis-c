@@ -1,10 +1,9 @@
-import React from 'react';
 import { Container, Row, Col } from 'shards-react';
 
 import PageTitle from '../components/common/PageTitle.component';
 import ChartCard from '../components/cards/Chart-card.component';
 import SlidersCard from '../components/cards/Sliders-card.component';
-import ChartInfoCard from '../components/cards/ChartInfo-card.component';
+// import ChartInfoCard from '../components/cards/ChartInfo-card.component';
 import PivotTableCard from '../components/cards/PivotTable-card.component';
 import FileManagerCard from '../components/cards/FileManager-card.component';
 import TableCsvDataCard from '../components/cards/TableCsvData-card.component';

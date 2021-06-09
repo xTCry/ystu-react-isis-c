@@ -90,12 +90,12 @@ const FileManagerCard = ({ title }) => {
 
                     {csvData.length > 0 && (
                         <ListGroupItem className="d-flex px-3 border-0">
-                            <Button theme="accent" size="sm" onClick={save2pdf}>
+                            <Button theme="primary" size="sm" onClick={save2pdf}>
                                 <i className="material-icons">save</i> Save as PDF
                             </Button>
 
                             <CSVLink data={csvData.map(({ x, y }) => [x, y])} className="ml-auto">
-                                <Button theme="accent" size="sm">
+                                <Button theme="secondary" size="sm">
                                     <i className="material-icons">file_copy</i> Save New csv data
                                 </Button>
                             </CSVLink>
