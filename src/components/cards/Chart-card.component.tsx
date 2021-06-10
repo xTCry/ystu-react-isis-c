@@ -35,7 +35,7 @@ const ChartCard = () => {
         let results = {};
         if (chartData.length > 1) {
             const dataPredictionLength = chartData.length + prediction;
-            const startLabel = chartData[0].x;
+            // const startLabel = chartData[0].x;
             const endLabel = chartData[chartData.length - 1].x;
             const dataPoints: regression.DataPoint[] = new Array(dataPredictionLength)
                 .fill(0)
@@ -95,7 +95,7 @@ const ChartCard = () => {
             <CardHeader className="border-bottom">
                 <h6 className="m-0">Smart Chart</h6>
             </CardHeader>
-            <CardBody className="pt-0">
+            <CardBody className="pt-0" data-tut="reactour__chart-card">
                 <Row className="border-bottom py-2 bg-light">
                     {/* <Col sm="6" className="d-flex mb-2 mb-sm-0">
                         <RangeDatePicker />
@@ -105,7 +105,7 @@ const ChartCard = () => {
                             View Full Report &rarr;
                         </Button>
                     </Col> */}
-                    <Col className="d-flex mb-0 mb-sm-0">
+                    <Col className="d-flex mb-0 mb-sm-0" data-tut="reactour__chart-card--regression-type-toggles">
                         Regressions type:
                         <ButtonGroup className="ml-3">
                             {radios.map((radio, idx) => (
@@ -126,7 +126,7 @@ const ChartCard = () => {
                         </ButtonGroup>
                     </Col>
                     <Col>
-                        <ButtonGroup className="ml-3">
+                        <ButtonGroup className="ml-3" data-tut="reactour__chart-card--regression-type-toggle-all">
                             <FormCheckbox
                                 inline
                                 toggle
@@ -146,7 +146,7 @@ const ChartCard = () => {
             </CardBody>
             <CardFooter className="border-top">
                 <Row>
-                    <Col>
+                    <Col data-tut="reactour__chart-card--formulas">
                         <table className="table mb-0">
                             <tbody className="bg-light">
                                 {Object.entries(regressionsResults).map(([name, result]: any) => (

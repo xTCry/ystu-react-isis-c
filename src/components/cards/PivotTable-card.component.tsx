@@ -16,7 +16,7 @@ const PivotTableCard = ({ title }) => {
                 <div className="block-handle" />
             </CardHeader>
 
-            <CardBody className="px-3 py-0">
+            <CardBody className="px-3 py-0" data-tut="reactour__pivot-table-card">
                 <table className="table mb-2" id="pivot-table">
                     <thead className="bg-light">
                         <tr>

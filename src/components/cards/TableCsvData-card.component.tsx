@@ -9,7 +9,7 @@ const TableCsvDataCard = ({ title }) => {
     const [isOpen, setOpen] = React.useState(true);
 
     return (
-        <Card small>
+        <Card small data-tut="reactour__table-csv-data-card">
             <CardHeader className="border-bottom">
                 <Button outline size="sm" onClick={() => setOpen((s) => !s)}>
                     <h6 className="m-0">

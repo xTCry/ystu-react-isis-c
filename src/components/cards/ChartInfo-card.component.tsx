@@ -100,7 +100,7 @@ const ChartInfoCard = ({ title }) => {
                             <ListGroupItem className="px-3 py-0">
                                 <strong className="d-block my-2">Filter bad dots</strong>
 
-                                <Row className="mb-3 mt-2">
+                                <Row className="mb-3 mt-2" data-tut="reactour__chart-info--errors-buttons">
                                     <Col>
                                         <Button
                                             outline
@@ -135,7 +135,7 @@ const ChartInfoCard = ({ title }) => {
                                 </code>
                             </ListGroupItem>
 
-                            <ListGroupItem className="px-3">
+                            <ListGroupItem className="px-3" data-tut="reactour__chart-info--regression-type">
                                 <strong className="d-block mb-2">
                                     Default regression type (best: {bestType} [
                                     {bestType && Math.round(regressionData[bestType]?.r2 * 100)}
@@ -143,7 +143,7 @@ const ChartInfoCard = ({ title }) => {
                                 </strong>
                                 <FormSelect onChange={onRegressionType} value={regressionType}>
                                     {Object.keys(RegressionType).map((e) => (
-                                        <option value={RegressionType[e]}>
+                                        <option key={RegressionType[e]} value={RegressionType[e]}>
                                             {e} [{Math.round(regressionData[RegressionType[e]]?.r2 * 100)}%]
                                         </option>
                                     ))}
@@ -153,9 +153,9 @@ const ChartInfoCard = ({ title }) => {
                     </CardBody>
                 )}
 
-                <CardFooter className="border-top d-flex">
+                <CardFooter className="border-top d-flex" data-tut="reactour__chart-info--undore">
                     <Button theme="light" disabled={prevChartData.length === 0} onClick={onBackChartData}>
-                        <i className="material-icons">file_copy</i> Undo [{prevChartData.length}]
+                        <i className="material-icons">undo</i> Undo [{prevChartData.length}]
                     </Button>
 
                     <Button
@@ -164,7 +164,7 @@ const ChartInfoCard = ({ title }) => {
                         disabled={nextChartData.length === 0}
                         onClick={onNextChartData}
                     >
-                        <i className="material-icons">file_copy</i> Redo [{nextChartData.length}]
+                        <i className="material-icons">redo</i> Redo [{nextChartData.length}]
                     </Button>
                 </CardFooter>
             </Collapse>

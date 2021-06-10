@@ -55,7 +55,7 @@ const SlidersCard = () => {
             <CardHeader className="border-bottom">
                 <h6 className="m-0">Options chart</h6>
             </CardHeader>
-            <ListGroup flush>
+            <ListGroup flush data-tut="reactour__sliders-card">
                 <ListGroupItem className="px-4">
                     <div className="mb-5">
                         <strong className="text-muted d-block">

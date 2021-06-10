@@ -3,6 +3,9 @@ import { createReducer } from '../reducer.utils';
 import { ChartActionsList, ChartState } from './types';
 import { RegressionType } from '../../../utils/formulas.util';
 
+export const isFirstRun = () => !store2('first_running_app');
+export const saveFirstRun = () => store2('first_running_app', Date.now());
+
 export const saveChartData = (chartData: any[]) =>
     store2('chart_data', JSON.stringify({ time: chartData.length > 0 ? Date.now() : 0, chartData }));
 export const loadChartData = () => {

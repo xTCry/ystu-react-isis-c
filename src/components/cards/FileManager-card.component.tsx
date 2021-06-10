@@ -101,7 +101,7 @@ const FileManagerCard = ({ title }) => {
             <Collapse open={isOpen}>
                 <CardBody className="p-0">
                     <ListGroup flush>
-                        <ListGroupItem className="p-3">
+                        <ListGroupItem className="p-3" data-tut="reactour__filemanager--status">
                             <span className="d-flex mb-2">
                                 <i className="material-icons mr-1">flag</i>
                                 <strong className="mr-1">Saved:</strong>
@@ -148,12 +148,25 @@ const FileManagerCard = ({ title }) => {
                         </ListGroupItem>
 
                         <ListGroupItem className="d-flex px-3 border-0">
-                            <Button disabled={chartData.length == 0} theme="primary" size="sm" onClick={onSave2pdf}>
+                            <Button
+                                disabled={chartData.length == 0}
+                                theme="primary"
+                                size="sm"
+                                onClick={onSave2pdf}
+                                data-tut="reactour__filemanager--save-pdf"
+                            >
                                 <i className="material-icons">save</i> Save as PDF
                             </Button>
 
                             {chartData.length !== 0 && (
-                                <Button theme="secondary" outline size="sm" onClick={onCloseCsv} className="ml-auto">
+                                <Button
+                                    theme="secondary"
+                                    outline
+                                    size="sm"
+                                    onClick={onCloseCsv}
+                                    className="ml-auto"
+                                    data-tut="reactour__filemanager--close"
+                                >
                                     <i className="material-icons">close</i> Close
                                 </Button>
                             )}
@@ -162,6 +175,7 @@ const FileManagerCard = ({ title }) => {
                                 onClick={onCsvLink}
                                 data={regressionData[regressionType]?.points2.map(({ x, y }) => [x, y]) || []}
                                 className="ml-auto"
+                                data-tut="reactour__filemanager--save-csv"
                             >
                                 <Button
                                     disabled={
