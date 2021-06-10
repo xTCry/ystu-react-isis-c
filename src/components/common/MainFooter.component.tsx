@@ -10,13 +10,22 @@ const MainFooter = ({ contained, menuItems, copyright }) => (
                 <Nav>
                     {menuItems.map((item, idx) => (
                         <NavItem key={idx}>
-                            <NavLink tag={Link} to={item.to}>
-                                {item.title}
-                            </NavLink>
+                            {item.to && (
+                                <NavLink tag={Link} to={item.to}>
+                                    {item.title}
+                                </NavLink>
+                            )}
+                            {item.href && (
+                                <NavLink>
+                                    <a href={item.href}>{item.title}</a>
+                                </NavLink>
+                            )}
                         </NavItem>
                     ))}
                 </Nav>
-                <span className="copyright ml-auto my-auto mr-2">{copyright} - v{packageJson.version}</span>
+                <span className="copyright ml-auto my-auto mr-2">
+                    {copyright} - v{packageJson.version}
+                </span>
             </Row>
         </Container>
     </footer>
@@ -48,6 +57,14 @@ MainFooter.defaultProps = {
         {
             title: 'About',
             to: '/about',
+        },
+        {
+            title: 'Downlaod test.csv',
+            href: '/exmpl_data.csv',
+        },
+        {
+            title: 'Downlaod bad.csv',
+            href: '/exmpl_data-bad.csv',
         },
     ],
 };
