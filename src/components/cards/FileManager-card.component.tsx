@@ -5,23 +5,57 @@ import CSVReader from 'react-csv-reader';
 import { CSVLink } from 'react-csv';
 import { Card, CardHeader, CardBody, ListGroup, ListGroupItem, Button, Collapse } from 'shards-react';
 import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import { autoTable } from 'jspdf-autotable';
 
 import * as chartActions from '../../store/reducer/chart/actions';
+import { RegressionType } from '../../utils/formulas.util';
 
 const FileManagerCard = ({ title }) => {
     const dispatch = useDispatch();
     const [isOpen, setOpen] = React.useState(true);
-    const { chartData, regressionData, regressionType, fileName, restored, saved } = useSelector((state) => state.chart);
+    const { chartData, regressionData, regressionType, fileName, restored, saved, prediction } = useSelector((state) => state.chart);
 
     const onSave2pdf = React.useCallback(() => {
+        if (Object.keys(RegressionType).length < 1) return;
         const canvas = document.getElementById('smart-chart') as HTMLCanvasElement;
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF({
-            orientation: 'landscape',
             unit: 'pt',
             format: [canvas.width, canvas.height],
         });
+
+        pdf.text(`Input data: ${chartData.length}`, 40, 55);
+        pdf.text(`Prediction: ${prediction}`, 40, 75);
+        pdf.setDrawColor(100, 100, 100);
+        pdf.line(100, 110, 500, 110);
+        
+        pdf.addPage([canvas.width, canvas.height], 'landscape');
         pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+
+        for (const e of Object.keys(RegressionType)) {
+            pdf.addPage('a4', 'portrait');
+            pdf.text(`Regression type: ${e}${RegressionType[e] === regressionType ? ' (Selected)' : ''}`, 40, 55);
+            ((pdf as any).autoTable as autoTable)({
+                margin: { top: 80 },
+                head: [['Id', 'Year', 'Value']],
+                body: [
+                    ...regressionData[RegressionType[e]]?.points2.map((e, i) => [
+                        { content: i + 1 },
+                        { content: e.x, styles: { textColor: i > chartData.length ? 101 : 20 } },
+                        { content: e.y, styles: { textColor: i > chartData.length ? 101 : 20 } },
+                    ]),
+                ],
+            });
+        }
+
+        pdf.addPage('a4', 'portrait');
+        pdf.text('Pivot table', 40, 55);
+        ((pdf as any).autoTable as autoTable)({
+            margin: { top: 80 },
+            html: '#pivot-table',
+        });
+
         let pdfName = 'download';
         if (fileName?.length > 0) {
             let q = fileName.split('.');
@@ -29,7 +63,7 @@ const FileManagerCard = ({ title }) => {
             pdfName = q.join('.');
         }
         pdf.save(`${pdfName}.pdf`);
-    }, []);
+    }, [chartData, regressionData, regressionType, fileName]);
 
     const onCloseCsv = React.useCallback(() => {
         (document.getElementById('react-csv-reader-input') as HTMLInputElement).value = null;

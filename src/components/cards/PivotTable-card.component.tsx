@@ -17,29 +17,29 @@ const PivotTableCard = ({ title }) => {
             </CardHeader>
 
             <CardBody className="px-3 py-0">
-                <table className="table mb-2">
+                <table className="table mb-2" id="pivot-table">
                     <thead className="bg-light">
                         <tr>
                             <th scope="col" className="border-0">
-                                Название
+                                Name
                             </th>
                             <th scope="col" className="border-0">
-                                Функция
+                                Function
                             </th>
                             <th scope="col" className="border-0">
-                                Остаточная дисперсия
+                                Residual variance
                             </th>
                             <th scope="col" className="border-0">
-                                Коэффициент корреляции
+                                Correlation coefficient
                             </th>
                             <th scope="col" className="border-0">
-                                Коэффициент детерминации
+                                Determination coefficient
                             </th>
                             <th scope="col" className="border-0">
-                                Средняя ошибка аппроксимации
+                                Avg approximation error
                             </th>
                             <th scope="col" className="border-0">
-                                F-критерий Фишера
+                                F-test
                             </th>
                         </tr>
                     </thead>
