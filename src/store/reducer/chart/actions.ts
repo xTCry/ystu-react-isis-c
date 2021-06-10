@@ -84,3 +84,10 @@ export const setSigmaMult = (sigmaMult) => {
         sigmaMult,
     };
 };
+
+export const setRegressionType = (regressionType) => {
+    return {
+        type: ChartActionsList.SET_REGRESSION_TYPE,
+        regressionType,
+    };
+};

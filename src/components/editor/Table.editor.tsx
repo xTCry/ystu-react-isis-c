@@ -59,8 +59,8 @@ const validate = (changed, validationStatus) =>
 
 const TableEditor = () => {
     const { chartData, setChartData } = useChartData();
-    const regressionData = useSelector((state) => state.chart.regressionData);
-    const firstRegressionData = Object.values(regressionData)[0];
+    const { regressionData, regressionType } = useSelector((state) => state.chart);
+    const firstRegressionData = regressionData[regressionType];
 
     const [rows, setRows] = useState([]);
     const [editingCells, setEditingCells] = useState([]);

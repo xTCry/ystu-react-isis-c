@@ -43,6 +43,7 @@ const ChartCard = () => {
             for (const type of regressionsTypesArr) {
                 let result: any = {
                     ...calcualteRegression(type, dataPoints),
+                    // color: ,
                     type,
                     dataPoints,
                     points2: new Array(dataPredictionLength).fill(null),
@@ -144,14 +145,13 @@ const ChartCard = () => {
                     <Col>
                         <table className="table mb-0">
                             <tbody className="bg-light">
-                                {//isDisplayAllRegressionsTypes && // выводить, только когда включены все (фича)
-                                    Object.entries(regressionsResults).map(([name, result]: any) => (
-                                        <tr key={name} style={{ color: result.color }}>
-                                            <td>{result.type}</td>
-                                            <td>R² = {result.r2}</td>
-                                            <td>{result.string}</td>
-                                        </tr>
-                                    ))}
+                                {Object.entries(regressionsResults).map(([name, result]: any) => (
+                                    <tr key={name} style={{ color: result.color }}>
+                                        <td>{result.type}</td>
+                                        <td>R² = {result.r2}</td>
+                                        <td>{result.string}</td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </Col>

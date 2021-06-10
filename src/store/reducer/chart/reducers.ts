@@ -1,6 +1,7 @@
 import store2 from 'store2';
 import { createReducer } from '../reducer.utils';
 import { ChartActionsList, ChartState } from './types';
+import { RegressionType } from '../../../utils/formulas.util';
 
 export const saveChartData = (chartData: any[]) =>
     store2('chart_data', JSON.stringify({ time: chartData.length > 0 ? Date.now() : 0, chartData }));
@@ -25,6 +26,7 @@ const initialState: ChartState = {
     prediction: 5,
     smoothLevel: 2,
     sigmaMult: 3,
+    regressionType: RegressionType.Linear,
 };
 
 const historyLimit = 20;
@@ -81,6 +83,7 @@ export const chartReducer = createReducer(initialState, {
         return { ...state, chartData: state.chartData, saved: 0 };
     },
     [ChartActionsList.SET_PREDICTION]: (state, { prediction }) => ({ ...state, prediction, saved: 0 }),
-    [ChartActionsList.SET_SMOOTH_LEVEL]: (state, { smoothLevel }) => ({ ...state, smoothLevel, saved: 0 }),
-    [ChartActionsList.SET_SIGMA_MULT]: (state, { sigmaMult }) => ({ ...state, sigmaMult, saved: 0 }),
+    [ChartActionsList.SET_SMOOTH_LEVEL]: (state, { smoothLevel }) => ({ ...state, smoothLevel }),
+    [ChartActionsList.SET_SIGMA_MULT]: (state, { sigmaMult }) => ({ ...state, sigmaMult }),
+    [ChartActionsList.SET_REGRESSION_TYPE]: (state, { regressionType }) => ({ ...state, regressionType }),
 });

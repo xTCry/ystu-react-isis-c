@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { Card, CardHeader, CardBody, ListGroup, ListGroupItem, Button } from 'shards-react';
+import { Card, CardHeader, CardBody, ListGroup, ListGroupItem, Button, Col, FormSelect } from 'shards-react';
 import * as chartActions from '../../store/reducer/chart/actions';
+import { RegressionType } from '../../utils/formulas.util';
 
 const ChartInfoCard = ({ title }) => {
     const dispatch = useDispatch();
-    const { prevChartData, nextChartData } = useSelector((state) => state.chart);
+    const { prevChartData, nextChartData, regressionType } = useSelector((state) => state.chart);
+
     let filterCount = 2;
 
     const onFilter = React.useCallback(() => {
@@ -19,6 +21,10 @@ const ChartInfoCard = ({ title }) => {
 
     const onNextChartData = React.useCallback(() => {
         dispatch(chartActions.nextChartData());
+    }, []);
+
+    const onRegressionType = React.useCallback((e) => {
+        dispatch(chartActions.setRegressionType(e.target.value));
     }, []);
 
     return (
@@ -41,6 +47,15 @@ const ChartInfoCard = ({ title }) => {
                         <Button outline theme="warning" onClick={onFilter} disabled={filterCount === 0}>
                             <i className="material-icons">file_copy</i> Filter data [{filterCount}]
                         </Button>
+                    </ListGroupItem>
+
+                    <ListGroupItem className="px-3">
+                        <strong className="d-block mb-2">Default regression type</strong>
+                        <FormSelect onChange={onRegressionType} value={regressionType}>
+                            {Object.keys(RegressionType).map((e) => (
+                                <option value={RegressionType[e]}>{e}</option>
+                            ))}
+                        </FormSelect>
                     </ListGroupItem>
 
                     <hr className="my-0" />

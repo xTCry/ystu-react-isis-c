@@ -17,7 +17,8 @@ export const ChartActionsList = applyPrefix(
     'ACTION_CHART_DATA',
     'SET_PREDICTION',
     'SET_SMOOTH_LEVEL',
-    'SET_SIGMA_MULT'
+    'SET_SIGMA_MULT',
+    'SET_REGRESSION_TYPE'
 );
 
 // Main state
@@ -33,4 +34,5 @@ export interface ChartState {
     prediction: number;
     smoothLevel: number;
     sigmaMult: number;
+    regressionType: RegressionType;
 }

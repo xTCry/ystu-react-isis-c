@@ -10,7 +10,7 @@ import * as chartActions from '../../store/reducer/chart/actions';
 
 const FileManagerCard = ({ title }) => {
     const dispatch = useDispatch();
-    const { chartData, fileName, restored, saved } = useSelector((state) => state.chart);
+    const { chartData, regressionData, regressionType, fileName, restored, saved } = useSelector((state) => state.chart);
 
     const onSave2pdf = React.useCallback(() => {
         const canvas = document.getElementById('smart-chart') as HTMLCanvasElement;
@@ -116,9 +116,19 @@ const FileManagerCard = ({ title }) => {
                             </Button>
                         )}
 
-                        <CSVLink onClick={onCsvLink} data={chartData.map(({ x, y }) => [x, y])} className="ml-auto">
-                            <Button disabled={chartData.length == 0} theme="secondary" size="sm">
-                                <i className="material-icons">file_copy</i> Save New csv data
+                        <CSVLink
+                            onClick={onCsvLink}
+                            data={regressionData[regressionType]?.points2.map(({ x, y }) => [x, y]) || []}
+                            className="ml-auto"
+                        >
+                            <Button
+                                disabled={
+                                    chartData.length === 0 || regressionData[regressionType]?.points2.length === 0
+                                }
+                                theme="secondary"
+                                size="sm"
+                            >
+                                <i className="material-icons">file_copy</i> Save New csv
                             </Button>
                         </CSVLink>
                     </ListGroupItem>

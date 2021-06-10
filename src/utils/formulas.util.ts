@@ -64,7 +64,13 @@ export const createSmoothData = (data, smoothValue = 3) => {
     return result;
 };
 
-export type RegressionType = 'linear' | 'exponential' | 'logarithmic' | 'power' | 'polynomial';
+export enum RegressionType {
+    Linear = 'linear',
+    Exponential = 'exponential',
+    Polynomial = 'polynomial',
+    // Power = 'power',
+    // Logarithmic = 'logarithmic',
+}
 export const calcualteRegression = (type: RegressionType, dataPoints: regression.DataPoint[]) => {
     let calculation = undefined;
     let realType = type;
