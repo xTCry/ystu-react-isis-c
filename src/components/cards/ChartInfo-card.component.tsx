@@ -26,7 +26,6 @@ const ChartInfoCard = ({ title }) => {
     const [bestType, setBestType] = React.useState<RegressionType>(null);
 
     const { sigmaMult, std, roman, sigma } = useChartDataErrors();
-    const updAll = React.useState(null)[1];
     const [filterSigmaCount, setFilterSigmaCount] = React.useState(0);
     const [filterRomanCount, setFilterRomanCount] = React.useState(0);
 
@@ -38,7 +37,6 @@ const ChartInfoCard = ({ title }) => {
     const onFilterRoman = React.useCallback(() => {
         const newData = chartData.filter((e, i) => roman[i].isOk && roman[i].y === e.y);
         dispatch(chartActions.setChartData(newData));
-        // updAll(null);
     }, [chartData, roman]);
 
     const onBackChartData = React.useCallback(() => {

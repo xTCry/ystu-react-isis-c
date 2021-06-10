@@ -36,6 +36,7 @@ const ChartCard = () => {
         if (chartData.length > 1) {
             const dataPredictionLength = chartData.length + prediction;
             const startLabel = chartData[0].x;
+            const endLabel = chartData[chartData.length - 1].x;
             const dataPoints: regression.DataPoint[] = new Array(dataPredictionLength)
                 .fill(0)
                 .map((v, i) => (i >= chartData.length ? [i, null] : [i, chartData[i].y]));
@@ -49,8 +50,11 @@ const ChartCard = () => {
                     points2: new Array(dataPredictionLength).fill(null),
                 };
                 result.points.forEach(([x, y], i) => {
-                    const index = i + startLabel;
-                    result.points2[i] = { x: index, y: i >= chartData.length ? y : chartData[i].y };
+                    // result.points2[i] = { x: i + startLabel, y: i >= chartData.length ? y : chartData[i].y };
+                    result.points2[i] = {
+                        x: i < chartData.length ? chartData[i].x : i + endLabel - chartData.length + 1,
+                        y: i < chartData.length ? chartData[i].y : y,
+                    };
                 });
                 results[type] = result;
             }

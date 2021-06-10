@@ -16,6 +16,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import { useSelector } from 'react-redux';
+import { useChartDataErrors } from '../variants/Variant7';
 
 const ruleRequired = (value) => String(value)?.trim().length > 0 || 'This field is required';
 const ruleNumber = (value) => !isNaN(Number(value)) || 'This field is number';
@@ -58,6 +59,7 @@ const validate = (changed, validationStatus) =>
     }, {});
 
 const TableEditor = () => {
+    const { roman, sigma } = useChartDataErrors();
     const { chartData, setChartData } = useChartData();
     const { regressionData, regressionType } = useSelector((state) => state.chart);
     const firstRegressionData = regressionData[regressionType];
@@ -96,6 +98,7 @@ const TableEditor = () => {
     };
     const addEmptyRow = () => commitChanges({ added: [{ x: 0, y: 0 }] });
 
+    const [errorStatus, setErrorStatus] = useState({});
     const [validationStatus, setValidationStatus] = useState({});
     const Cell = React.useCallback(
         (props) => {
@@ -105,20 +108,37 @@ const TableEditor = () => {
             } = props;
             const columnStatus = validationStatus[rowId]?.[columnName];
             const valid = !columnStatus || columnStatus.isValid;
+            const error = errorStatus[rowId];
 
             const style = {
+                ...(error ? { border: '1px solid blue' } : null),
                 ...(!valid ? { border: '1px solid red' } : null),
             };
             const title = valid ? '' : validationStatus[rowId][columnName].error;
 
             return <Table.Cell {...props} style={style} title={title} />;
         },
-        [validationStatus]
+        [validationStatus, errorStatus]
     );
 
     React.useEffect(() => {
         setRows(chartData.map((e, i) => ({ id: i, ...e })));
     }, [chartData]);
+
+    React.useEffect(() => {
+        let rows = {};
+        let i = 0;
+        for (let s of sigma) {
+            if (!s.isOk) rows[i] = 'sigma';
+            ++i;
+        }
+        i = 0;
+        for (let s of roman) {
+            if (!s.isOk) rows[i] = 'roman';
+            ++i;
+        }
+        setErrorStatus(rows);
+    }, [sigma, roman, setErrorStatus]);
 
     return (
         <>
