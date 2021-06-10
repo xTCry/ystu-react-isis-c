@@ -18,7 +18,19 @@ const RomanTable = {
     p_90: [1.69, 2.0, 2.17, 2.29, 2.39, 2.49, 2.62],
 };
 
-export const Roman = (yArr: number[], std: number) => {
+export const Roman = (yArr: number[], stdOrB: boolean | number) => {
+    if (stdOrB === true) {
+        const res = [];
+        const temp = [...yArr];
+        while (temp.length > 0) {
+            const chunk = temp.splice(0, 20);
+            res.push(...Roman(chunk, false));
+        }
+        return res;
+    }
+
+    const std = typeof stdOrB === 'boolean' ? stdCalc(yArr) : stdOrB;
+
     const avg = avgA(yArr);
     const len = yArr.length;
     const coeff =

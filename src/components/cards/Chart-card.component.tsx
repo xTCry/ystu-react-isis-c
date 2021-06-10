@@ -40,7 +40,7 @@ const ChartCard = () => {
                 .fill(0)
                 .map((v, i) => (i >= chartData.length ? [i, null] : [i, chartData[i].y]));
 
-            for (const type of regressionsTypesArr) {
+            for (const type of Object.values(RegressionType)) {
                 let result: any = {
                     ...calcualteRegression(type, dataPoints),
                     // color: ,

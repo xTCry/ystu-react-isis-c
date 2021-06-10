@@ -32,15 +32,15 @@ declare module 'chart.js' {
     }
 }
 
-const useChartDataErrors = () => {
+export const useChartDataErrors = () => {
     const { chartData, sigmaMult } = useSelector((state) => state.chart);
 
-    const [yArr, setYArr] = React.useState([]);
+    const [yArr, setYArr] = React.useState<number[]>([]);
     const [std, set_std] = React.useState(0);
     const [std20, set_std20] = React.useState(0);
 
-    const [roman, set_roman] = React.useState([]);
-    const [sigma, set_sigma] = React.useState([]);
+    const [roman, set_roman] = React.useState<ReturnType<typeof formulasUtil.Roman>>([]);
+    const [sigma, set_sigma] = React.useState<ReturnType<typeof formulasUtil.Sigma>>([]);
 
     React.useEffect(() => {
         setYArr(chartData.map((e) => e.y));
@@ -52,8 +52,9 @@ const useChartDataErrors = () => {
     }, [yArr]);
 
     React.useEffect(() => {
-        set_roman(formulasUtil.Roman(yArr.slice(0, 20), std20));
-    }, [std20]);
+        set_roman(formulasUtil.Roman(yArr, true/* , std20 */));
+    }, [yArr]);
+
     React.useEffect(() => {
         set_sigma(formulasUtil.Sigma(yArr, std, sigmaMult));
     }, [std, sigmaMult]);
@@ -118,7 +119,7 @@ const Variant7 = (props: {
     chart: any;
 }) => {
     const { newData, dataLength, smartLabels, smoothDataY, smoothLevel } = useChartData();
-    const {  sigmaMult, std, roman, sigma } = useChartDataErrors();
+    const { sigmaMult, std, roman, sigma } = useChartDataErrors();
     // console.log('redraw char var7');
 
     const mode = 'x';
@@ -262,7 +263,7 @@ const Variant7 = (props: {
                   },
               },
               {
-                name: DatasetName.RegressionExponential,
+                  name: DatasetName.RegressionExponential,
                   label: 'Regression (exponential)',
                   data: newData,
                   fill: false,
@@ -288,7 +289,7 @@ const Variant7 = (props: {
                   },
               },
               {
-                name: DatasetName.RegressionPolynomial,
+                  name: DatasetName.RegressionPolynomial,
                   label: 'Regression (polynomial)',
                   data: newData,
                   fill: false,
@@ -320,6 +321,7 @@ const Variant7 = (props: {
         datasets: [
             // Roman
             {
+                hidden: true,
                 type: ErrorBarsController.id,
                 name: DatasetName.Roman,
                 label: '# Data (by Romanovskiy)',
@@ -338,6 +340,7 @@ const Variant7 = (props: {
                 // tension: 0.5,
             },
             {
+                hidden: true,
                 name: DatasetName.RomanPlus,
                 label: '# Data (by Romanovskiy +)',
                 data: roman.map((e) => e.y + e.beta),
@@ -347,6 +350,7 @@ const Variant7 = (props: {
                 tension: 0.5,
             },
             {
+                hidden: true,
                 name: DatasetName.RomanMinus,
                 label: '# Data (by Romanovskiy -)',
                 data: roman.map((e) => e.y - e.beta),
@@ -358,7 +362,7 @@ const Variant7 = (props: {
 
             // Sigma
             {
-                hidden: true,
+                // hidden: true,
                 name: DatasetName.Sigma,
                 type: ErrorBarsController.id,
                 label: '# of Years (Sigma)',
@@ -374,7 +378,7 @@ const Variant7 = (props: {
                 },
             },
             {
-                hidden: true,
+                // hidden: true,
                 name: DatasetName.SigmaPlus,
                 label: '# of Years (Sigma +)',
                 data: sigma.map((e) => e.y + e.beta),
@@ -387,6 +391,7 @@ const Variant7 = (props: {
 
             // smooth
             {
+                hidden: true,
                 name: DatasetName.Smooth,
                 label: `Smooth data (lvl=${smoothLevel})`,
                 data: smoothDataY,

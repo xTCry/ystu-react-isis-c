@@ -30,7 +30,7 @@ export interface ChartState {
     chartData: Point[];
     prevChartData: Point[][];
     nextChartData: Point[][];
-    regressionData: { [K in RegressionType]?: { points2: Point[] } };
+    regressionData: { [K in RegressionType]?: { r2: number; points2: Point[] } };
     prediction: number;
     smoothLevel: number;
     sigmaMult: number;
