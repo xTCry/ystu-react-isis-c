@@ -21,7 +21,7 @@ const initialState: ChartState = {
     chartData,
     prevChartData: [],
     nextChartData: [],
-    regressionData: [],
+    regressionData: {},
     prediction: 5,
     smoothLevel: 2,
     sigmaMult: 3,
@@ -41,7 +41,7 @@ export const chartReducer = createReducer(initialState, {
         chartData: [],
         prevChartData: [],
         nextChartData: [],
-        regressionData: [],
+        regressionData: {},
     }),
     [ChartActionsList.SET_CHART_DATA]: (state, { chartData }) => ({
         ...state,

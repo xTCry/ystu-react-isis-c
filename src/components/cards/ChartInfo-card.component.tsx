@@ -6,7 +6,7 @@ import * as chartActions from '../../store/reducer/chart/actions';
 
 const ChartInfoCard = ({ title }) => {
     const dispatch = useDispatch();
-    const { prevChartData, nextChartData, restored, saved } = useSelector((state) => state.chart);
+    const { prevChartData, nextChartData } = useSelector((state) => state.chart);
     let filterCount = 2;
 
     const onFilter = React.useCallback(() => {
@@ -29,20 +29,13 @@ const ChartInfoCard = ({ title }) => {
 
             <CardBody className="p-0">
                 <ListGroup flush>
-                    <ListGroupItem className="p-3">
+                    {/* <ListGroupItem className="p-3">
                         <span className="d-flex mb-2">
                             <i className="material-icons mr-1">calendar_today</i>
                             <strong className="mr-1">Saved:</strong>
                             {saved === 0 ? 'Not' : ` at ${new Date(saved)}`}
                         </span>
-                        <span className="d-flex">
-                            <i className="material-icons mr-1">score</i>
-                            <strong className="mr-1">Restored:</strong>
-                            <strong className="text-warning">
-                                {restored === 0 ? 'Not' : `Restored at ${new Date(restored)}`}
-                            </strong>
-                        </span>
-                    </ListGroupItem>
+                    </ListGroupItem> */}
 
                     <ListGroupItem className="d-flex px-3">
                         <Button outline theme="warning" onClick={onFilter} disabled={filterCount === 0}>

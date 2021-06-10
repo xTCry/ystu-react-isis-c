@@ -1,4 +1,5 @@
 import { Point } from 'chart.js';
+import { RegressionType } from '../../../utils/formulas.util';
 import { applyPrefix } from '../reducer.utils';
 
 export const ChartActionsList = applyPrefix(
@@ -28,7 +29,7 @@ export interface ChartState {
     chartData: Point[];
     prevChartData: Point[][];
     nextChartData: Point[][];
-    regressionData: Point[];
+    regressionData: { [K in RegressionType]?: { points2: Point[] } };
     prediction: number;
     smoothLevel: number;
     sigmaMult: number;

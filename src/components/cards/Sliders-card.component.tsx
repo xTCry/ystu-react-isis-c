@@ -10,6 +10,7 @@ const SlidersCard = () => {
     const dispatch = useDispatch();
     const [prediction, setPrediction] = React.useState(useSelector((s) => s.chart.prediction));
     const [smoothLevel, setSmoothLevel] = React.useState(useSelector((s) => s.chart.smoothLevel));
+    const [sigmaMult, setSigmaMult] = React.useState(useSelector((s) => s.chart.sigmaMult));
 
     const handleSlidePrediction = React.useCallback(([start, end]) => {
         setPrediction(parseFloat(start));
@@ -17,6 +18,10 @@ const SlidersCard = () => {
 
     const handleSlideSmoothLevel = React.useCallback(([start, end]) => {
         setSmoothLevel(parseFloat(start));
+    }, []);
+
+    const handleSlideSigmaMult = React.useCallback(([start, end]) => {
+        setSigmaMult(parseFloat(start));
     }, []);
 
     useDebounce/* Effect */(
@@ -37,6 +42,14 @@ const SlidersCard = () => {
         // smoothLevel,
     );
 
+    useDebounce(
+        () => {
+            dispatch(chartActions.setSigmaMult(sigmaMult));
+        },
+        300,
+        [sigmaMult],
+    );
+
     return (
         <Card small className="mb-4">
             <CardHeader className="border-bottom">
@@ -49,7 +62,7 @@ const SlidersCard = () => {
                             Прогноз на {prediction} {declOfNum(prediction, ['год', 'года', 'лет'])} вперед
                         </strong>
                         <Slider
-                            theme="info"
+                            theme="success"
                             className="my-3"
                             start={[prediction]}
                             onSlide={handleSlidePrediction}
@@ -72,6 +85,21 @@ const SlidersCard = () => {
                             range={{ min: 1, max: 10 }}
                             connect={[true, false]}
                             pips={{ mode: 'steps', stepped: true, density: 10 }}
+                        />
+                    </div>
+                    <div className="my-5">
+                        <strong className="text-muted d-block">
+                            Коэффициент для сигмы {sigmaMult}
+                        </strong>
+                        <Slider
+                            theme="info"
+                            className="my-3"
+                            start={[sigmaMult]}
+                            onSlide={handleSlideSigmaMult}
+                            step={0.25}
+                            range={{ min: 1, max: 5 }}
+                            connect={[true, false]}
+                            pips={{ mode: 'steps', stepped: true, density: 3 }}
                         />
                     </div>
                 </ListGroupItem>

@@ -10,7 +10,12 @@ import {
     TableInlineCellEditing,
 } from '@devexpress/dx-react-grid-material-ui';
 import { useChartData } from '../chartData-context.component';
-// import debounce from 'lodash.debounce';
+
+import TableMUI from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
+import { useSelector } from 'react-redux';
 
 const ruleRequired = (value) => String(value)?.trim().length > 0 || 'This field is required';
 const ruleNumber = (value) => !isNaN(Number(value)) || 'This field is number';
@@ -54,6 +59,8 @@ const validate = (changed, validationStatus) =>
 
 const TableEditor = () => {
     const { chartData, setChartData } = useChartData();
+    const regressionData = useSelector((state) => state.chart.regressionData);
+    const firstRegressionData = Object.values(regressionData)[0];
 
     const [rows, setRows] = useState([]);
     const [editingCells, setEditingCells] = useState([]);
@@ -82,7 +89,7 @@ const TableEditor = () => {
             }))
             .sort((a, b) => a.x - b.x);
 
-        console.log('new tabele edit result', result);
+        // console.log('new tabele edit result', result);
 
         setRows(result);
         setChartData(result.map(({ x, y }) => ({ x, y })));
@@ -114,21 +121,39 @@ const TableEditor = () => {
     }, [chartData]);
 
     return (
-        <Paper>
-            <Grid rows={rows} columns={columns} getRowId={getRowId}>
-                <EditingState
-                    onCommitChanges={commitChanges}
-                    editingCells={editingCells}
-                    onEditingCellsChange={setEditingCells}
-                    addedRows={[]}
-                    onAddedRowsChange={addEmptyRow}
-                />
-                <Table cellComponent={Cell} />
-                <TableHeaderRow />
-                <TableInlineCellEditing selectTextOnEditStart />
-                <TableEditColumn showAddCommand showDeleteCommand />
-            </Grid>
-        </Paper>
+        <>
+            <Paper>
+                <Grid rows={rows} columns={columns} getRowId={getRowId}>
+                    <EditingState
+                        onCommitChanges={commitChanges}
+                        editingCells={editingCells}
+                        onEditingCellsChange={setEditingCells}
+                        addedRows={[]}
+                        onAddedRowsChange={addEmptyRow}
+                    />
+                    <Table cellComponent={Cell} />
+                    <TableHeaderRow />
+                    <TableInlineCellEditing selectTextOnEditStart />
+                    <TableEditColumn showAddCommand showDeleteCommand />
+                </Grid>
+                <TableMUI>
+                    <colgroup>
+                        <col style={{ width: '150px' }} />
+                        <col />
+                        <col />
+                    </colgroup>
+                    <TableBody>
+                        {firstRegressionData?.points2.slice(chartData.length).map((point) => (
+                            <TableRow key={point.x}>
+                                <TableCell />
+                                <TableCell style={{ color: 'gray' }}>{point.x}</TableCell>
+                                <TableCell style={{ color: 'gray' }}>{point.y}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </TableMUI>
+            </Paper>
+        </>
     );
 };
 

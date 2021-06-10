@@ -32,10 +32,8 @@ declare module 'chart.js' {
     }
 }
 
-const useChartData = () => {
-    const { prediction, smoothLevel, chartData, sigmaMult } = useSelector((s) => s.chart);
-
-    const [dataPredictionLength, setDataPredictionLen] = React.useState(chartData.length + (prediction || 0));
+const useChartDataErrors = () => {
+    const { chartData, sigmaMult } = useSelector((state) => state.chart);
 
     const [yArr, setYArr] = React.useState([]);
     const [std, set_std] = React.useState(0);
@@ -43,10 +41,6 @@ const useChartData = () => {
 
     const [roman, set_roman] = React.useState([]);
     const [sigma, set_sigma] = React.useState([]);
-
-    const [newData, setNewData] = React.useState([]);
-    const [smartLabels, setSmartLabels] = React.useState([]);
-    const [smoothDataY, setSmoothDataY] = React.useState([]);
 
     React.useEffect(() => {
         setYArr(chartData.map((e) => e.y));
@@ -63,6 +57,28 @@ const useChartData = () => {
     React.useEffect(() => {
         set_sigma(formulasUtil.Sigma(yArr, std, sigmaMult));
     }, [std, sigmaMult]);
+
+    return {
+        sigmaMult,
+        chartData,
+        std,
+        std20,
+        roman,
+        sigma,
+    };
+};
+
+const useChartData = () => {
+    const { prediction, smoothLevel, chartData } = useSelector((state) => state.chart);
+
+    const [dataPredictionLength, setDataPredictionLen] = React.useState(chartData.length + (prediction || 0));
+
+    const [newData, setNewData] = React.useState([]);
+    const [smartLabels, setSmartLabels] = React.useState([]);
+    const [smoothDataY, setSmoothDataY] = React.useState([]);
+
+    const labels = chartData.map((e) => e.x);
+    const dataLength = chartData.length;
 
     React.useEffect(() => {
         const dataPredictionLength = chartData.length + prediction;
@@ -85,24 +101,13 @@ const useChartData = () => {
         setSmoothDataY(formulasUtil.createSmoothData(chartData, smoothLevel));
     }, [chartData, smoothLevel, setSmoothDataY]);
 
-    const labels = chartData.map((e) => e.x);
-
-    const dataLength = chartData.length;
-
     return {
         newData,
         dataLength,
-        dataPredictLength: dataPredictionLength,
+        dataPredictionLength,
         smartLabels,
         smoothDataY,
         smoothLevel,
-
-        sigmaMult,
-        chartData,
-        std,
-        std20,
-        roman,
-        sigma,
     };
 };
 
@@ -111,9 +116,9 @@ const Variant7 = (props: {
     regressionsTypes?: any[];
     isDisplayAllRegressionsTypes?: boolean;
     chart: any;
-    onRegressionResults?: Function;
 }) => {
-    const { newData, dataLength, smartLabels, smoothDataY, sigmaMult, std, roman, sigma, smoothLevel } = useChartData();
+    const { newData, dataLength, smartLabels, smoothDataY, smoothLevel } = useChartData();
+    const {  sigmaMult, std, roman, sigma } = useChartDataErrors();
     // console.log('redraw char var7');
 
     const mode = 'x';
@@ -179,9 +184,6 @@ const Variant7 = (props: {
                     },
                 },
             },
-            regressions: {
-                onCompleteCalculation: (c) => props.onRegressionResults?.(c),
-            },
         },
         animations: {
             /* y: {
@@ -211,8 +213,8 @@ const Variant7 = (props: {
                   data: newData,
                   fill: false,
                   showLine: showRegressionsLine,
-                  borderColor: 'rgba(120,120,120,0.8)',
-                  backgroundColor: 'rgba(120,120,120,0.3)',
+                  borderColor: 'rgba(0, 183, 255, 0.2)',
+                  backgroundColor: 'rgba(0, 183, 255, 0.3)',
 
                   regressions: {
                       type: props.regressionsTypes || ['linear'],
@@ -221,7 +223,7 @@ const Variant7 = (props: {
                       sections: [
                           {
                               endIndex: dataLength - 1,
-                              line: { color: 'rgba(255,10,10,0.6)' },
+                              line: { color: 'rgba(255, 0, 119, 0.9)' },
                           },
                           {
                               type: 'copy',
@@ -239,8 +241,8 @@ const Variant7 = (props: {
                   data: newData,
                   fill: false,
                   showLine: showRegressionsLine,
-                  borderColor: 'rgba(120,120,120,0.8)',
-                  backgroundColor: 'rgba(120,120,120,0.3)',
+                  borderColor: 'rgba(255, 174, 0, 0.1)',
+                  backgroundColor: 'rgba(255, 174, 0, 0.3)',
 
                   regressions: {
                       type: ['linear'],
@@ -249,7 +251,7 @@ const Variant7 = (props: {
                       sections: [
                           {
                               endIndex: dataLength - 1,
-                              line: { color: 'red' },
+                              line: { color: 'rgba(255, 174, 0, 0.9)' },
                           },
                           {
                               type: 'copy',
@@ -265,8 +267,8 @@ const Variant7 = (props: {
                   data: newData,
                   fill: false,
                   showLine: showRegressionsLine,
-                  borderColor: 'rgba(120,120,120,0.8)',
-                  backgroundColor: 'rgba(120,120,120,0.3)',
+                  borderColor: 'rgba(0, 145, 255, 0.1)',
+                  backgroundColor: 'rgba(0, 145, 255, 0.3)',
 
                   regressions: {
                       type: ['exponential'],
@@ -275,7 +277,7 @@ const Variant7 = (props: {
                       sections: [
                           {
                               endIndex: dataLength - 1,
-                              line: { color: 'red' },
+                              line: { color: 'rgba(0, 145, 255, 0.9)' },
                           },
                           {
                               type: 'copy',
@@ -291,8 +293,8 @@ const Variant7 = (props: {
                   data: newData,
                   fill: false,
                   showLine: showRegressionsLine,
-                  borderColor: 'rgba(120,120,120,0.8)',
-                  backgroundColor: 'rgba(120,120,120,0.3)',
+                  borderColor: 'rgba(246, 0, 255, 0.1)',
+                  backgroundColor: 'rgba(246, 0, 255, 0.3)',
 
                   regressions: {
                       type: ['polynomial'],
@@ -301,7 +303,7 @@ const Variant7 = (props: {
                       sections: [
                           {
                               endIndex: dataLength - 1,
-                              line: { color: 'red' },
+                              line: { color: 'rgba(246, 0, 255, 0.9)' },
                           },
                           {
                               type: 'copy',

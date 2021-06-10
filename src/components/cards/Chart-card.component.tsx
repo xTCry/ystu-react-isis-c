@@ -1,18 +1,21 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ChartRegressions } from 'chartjs-plugin-regression';
 import { Row, Col, Card, CardHeader, CardBody, CardFooter, FormCheckbox, ButtonGroup } from 'shards-react';
+import * as regression from 'regression';
 
 import Variant7, { DatasetName } from '../variants/Variant7';
 import * as chartActions from '../../store/reducer/chart/actions';
+import { calcualteRegression, RegressionType } from '../../utils/formulas.util';
 
 const ChartCard = () => {
-    const chartData = React.useRef({ chart: null, data: null });
+    const { chartData, prediction } = useSelector((state) => state.chart);
+    const chartAndData = React.useRef({ chart: null, data: null });
     const dispatch = useDispatch();
 
     const [isLockRegressionsTypes, setLockRegressionsTypes] = React.useState(false);
     const [isDisplayAllRegressionsTypes, setDisplayAllRegressionsTypes] = React.useState(false);
-    const [regressionsTypes, setRegressionsTypes] = React.useState({
+    const [regressionsTypes, setRegressionsTypes] = React.useState<{ [K in RegressionType]?: boolean }>({
         linear: true,
         exponential: true,
         polynomial: true,
@@ -21,37 +24,41 @@ const ChartCard = () => {
         () =>
             Object.entries(regressionsTypes)
                 .filter(([, e]) => e)
-                .map(([e]) => e),
+                .map(([e]) => e as RegressionType),
         [regressionsTypes]
     );
     const [regressionsResults, setRegressionsResults] = React.useState<any>({});
 
     const onRegressionResults = React.useCallback(() => {
-        if (!chartData.current.chart) return;
+        if (!chartAndData.current.chart) return;
 
-        const maxDatasets = 10;
         let results = {};
-        for (let i = 0; i < maxDatasets; ++i) {
-            const sections = ChartRegressions.getSections(chartData.current.chart, i);
-            sections?.forEach((section) => {
-                const name = (
-                    ((section as any)._meta.dataset.name as DatasetName)?.toString().split('regression')[1] as string
-                ).toLowerCase();
-                if (section.result.r2 && name && regressionsTypes[name]) {
-                    results[name] = {
-                        type: section.result.type,
-                        string: section.result.string,
-                        color: section.line.color,
-                        equation: [...section.result.equation],
-                        r2: Math.round(section.result.r2 * 1e3) / 10 + '%',
-                    };
-                }
-            });
+        if (chartData.length > 1) {
+            const dataPredictionLength = chartData.length + prediction;
+            const startLabel = chartData[0].x;
+            const dataPoints: regression.DataPoint[] = new Array(dataPredictionLength)
+                .fill(0)
+                .map((v, i) => (i >= chartData.length ? [i, null] : [i, chartData[i].y]));
+
+            for (const type of regressionsTypesArr) {
+                let result: any = {
+                    ...calcualteRegression(type, dataPoints),
+                    type,
+                    dataPoints,
+                    points2: new Array(dataPredictionLength).fill(null),
+                };
+                result.points.forEach(([x, y], i) => {
+                    const index = i + startLabel;
+                    result.points2[i] = { x: index, y: i >= chartData.length ? y : chartData[i].y };
+                });
+                results[type] = result;
+            }
         }
 
-        // dispatch(chartActions.setRegressionData(results));
+        console.log('setRegressionData', results);
+        dispatch(chartActions.setRegressionData(results));
         setRegressionsResults(results);
-    }, [regressionsTypes]);
+    }, [regressionsTypes, chartData, prediction]);
 
     const handleChangeRegressionsTypes = React.useCallback((e, name) => {
         setRegressionsTypes((state) => ({
@@ -61,12 +68,16 @@ const ChartCard = () => {
     }, []);
 
     React.useEffect(() => {
+        onRegressionResults();
+    }, [chartData, prediction, regressionsTypes, isDisplayAllRegressionsTypes]);
+
+    React.useEffect(() => {
         setLockRegressionsTypes(Object.values(regressionsTypes).filter(Boolean).length === 1);
     }, [regressionsTypes, setLockRegressionsTypes]);
 
     React.useEffect(() => {
-        (window as any).chartData = () => chartData.current;
-    }, [chartData.current]);
+        (window as any).chartData = () => chartAndData.current;
+    }, [chartAndData.current]);
 
     const radios = [
         { name: 'Linear', value: 'linear' },
@@ -124,9 +135,8 @@ const ChartCard = () => {
                 </Row>
                 <Variant7
                     regressionsTypes={regressionsTypesArr}
-                    onRegressionResults={onRegressionResults}
                     isDisplayAllRegressionsTypes={isDisplayAllRegressionsTypes}
-                    chart={chartData}
+                    chart={chartAndData}
                 />
             </CardBody>
             <CardFooter className="border-top">
@@ -134,7 +144,7 @@ const ChartCard = () => {
                     <Col>
                         <table className="table mb-0">
                             <tbody className="bg-light">
-                                {isDisplayAllRegressionsTypes && // выводить, только когда включены все (фича)
+                                {//isDisplayAllRegressionsTypes && // выводить, только когда включены все (фича)
                                     Object.entries(regressionsResults).map(([name, result]: any) => (
                                         <tr key={name} style={{ color: result.color }}>
                                             <td>{result.type}</td>
